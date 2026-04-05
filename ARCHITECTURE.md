@@ -107,3 +107,43 @@ The following references were used in the preparation of this document and the d
 | 5 | Vercel Documentation - [https://vercel.com/docs](https://vercel.com/docs) |
 
 ---
+
+## 3. Software Architecture
+
+### 3.1 Overview
+
+HomeLink follows a **client-server architecture** where the frontend is a React-based Single Page Application (SPA) and the backend services are provided by Supabase, a Backend-as-a-Service (BaaS) platform. This architecture enables rapid development with minimal backend code, as Supabase automatically generates REST APIs from the PostgreSQL database schema, handles user authentication, and provides real-time data synchronization through WebSocket connections.
+
+### 3.2 The 4+1 View Model
+
+This document organizes the HomeLink architecture using the **4+1 Architectural View Model** defined by Philippe Kruchten. Each view captures a different aspect of the system:
+
+| View | Description | Key Diagrams |
+|------|-------------|-------------|
+| **Logical View** | Describes the system's key abstractions as classes and entities, their attributes, methods, and relationships. Shows the object-oriented decomposition of the domain model. | Class Diagram |
+| **Process View** | Captures the system's dynamic behavior, including runtime interactions between components, concurrency, and synchronization. Shows how the system handles key workflows. | Sequence Diagrams, Activity Diagram |
+| **Development View** | Describes the static organization of the software in its development environment, including the module structure, package layout, and technology stack. | Component Diagram, Package Diagram |
+| **Physical View** | Maps software components to the physical infrastructure, showing deployment topology, network communication, and cloud services. | Deployment Diagram |
+| **Scenarios (+1)** | Describes the most important use cases that drive and validate the architecture. Use cases connect all four views and demonstrate how they work together. | Use Case Diagram |
+
+### 3.3 Architectural Style
+
+HomeLink uses a **two-tier client-server architecture**:
+
+- **Client Tier (Frontend):** A React 18 SPA styled with Tailwind CSS, served as static files through Vercel CDN. The client handles all UI rendering, routing, and user interactions. It communicates with the backend exclusively through API calls and WebSocket subscriptions.
+
+- **Server Tier (Backend):** Supabase provides all backend services including:
+  - **PostgreSQL Database** - Relational data storage with Row Level Security (RLS)
+  - **PostgREST API** - Auto-generated RESTful API for CRUD operations
+  - **Supabase Auth** - User authentication with JWT token management
+  - **Supabase Realtime** - WebSocket-based real-time data broadcasting
+
+### 3.4 Communication Patterns
+
+The system uses two primary communication patterns between the client and server:
+
+1. **REST API (HTTPS):** All standard CRUD operations (creating dues, submitting maintenance requests, fetching announcements) are performed through synchronous REST API calls to the Supabase PostgREST endpoint.
+
+2. **WebSocket (WSS):** Real-time updates are delivered through Supabase Realtime WebSocket subscriptions. When a manager creates new dues or confirms a payment, all connected clients receive the update instantly without requiring a page refresh. The frontend subscribes to relevant database table changes on component mount and automatically updates the UI when changes are detected.
+
+---
