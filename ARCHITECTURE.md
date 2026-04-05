@@ -66,3 +66,44 @@
 | Figure 8.1 | Deployment Diagram | Section 8.1 |
 
 ---
+
+## 1. Scope
+
+### 1.1 Project Description
+
+HomeLink is a web-based property management system designed to digitize and streamline the administrative operations of residential buildings. The platform serves as a bridge between building managers and residents, providing tools for managing monthly dues, tracking payments, handling maintenance requests, and broadcasting announcements. By replacing traditional paper-based or informal communication methods, HomeLink aims to improve transparency, efficiency, and accountability in building management.
+
+### 1.2 Document Purpose
+
+This Software Architecture Document (SAD) describes the architecture of the HomeLink system using the **4+1 View Model** introduced by Philippe Kruchten (1995). The 4+1 model organizes the architecture into five concurrent views, each addressing a specific set of concerns:
+
+- **Logical View** - The object-oriented decomposition of the system into key abstractions (classes and entities)
+- **Process View** - The system's concurrency, synchronization, and runtime behavior
+- **Development View** - The organization of the software modules, packages, and layers
+- **Physical View** - The mapping of software components to hardware and cloud infrastructure
+- **Scenarios (+1)** - Use cases that validate and illustrate the architecture
+
+### 1.3 Target Audience
+
+This document is intended for:
+
+- **Developers** working on the HomeLink codebase who need to understand the system structure
+- **Stakeholders** evaluating the technical approach and architectural decisions
+- **Course Instructors** assessing the quality and completeness of the architectural documentation
+- **Maintainers** who will extend or modify the system in the future
+
+---
+
+## 2. References
+
+The following references were used in the preparation of this document and the development of the HomeLink system:
+
+| # | Reference |
+|---|-----------|
+| 1 | Kruchten, P.B. (1995). "The 4+1 View Model of Architecture." *IEEE Software*, 12(6), pp. 42-50. |
+| 2 | React Documentation - [https://react.dev/](https://react.dev/) |
+| 3 | Supabase Documentation - [https://supabase.com/docs](https://supabase.com/docs) |
+| 4 | Tailwind CSS Documentation - [https://tailwindcss.com/docs](https://tailwindcss.com/docs) |
+| 5 | Vercel Documentation - [https://vercel.com/docs](https://vercel.com/docs) |
+
+---
