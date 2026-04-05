@@ -193,4 +193,121 @@ graph LR
 | **Manager** | The building administrator responsible for creating dues, confirming payments, posting announcements, and managing all building units. Has full administrative access to the system. |
 | **Resident** | A tenant living in one of the building units. Can view their dues and balance, notify the manager of payments, submit maintenance requests, and view announcements. |
 
+### 9.3 Detailed Use Cases
+
+#### UC-01: User Registration and Login
+
+| Field | Detail |
+|-------|--------|
+| **Use Case ID** | UC-01 |
+| **Use Case Name** | User Registration and Login |
+| **Actor(s)** | Manager, Resident |
+| **Precondition** | The user has access to the HomeLink application URL in a web browser. For login, the user must already have a registered account. |
+
+**Main Flow:**
+1. The user navigates to the HomeLink application URL.
+2. The system displays the login page with email and password fields.
+3. **For new users:** The user clicks "Sign Up" and enters their full name, email, password, and selects their role (Manager or Resident).
+4. The system sends the registration data to Supabase Auth, which creates a new user account.
+5. **For existing users:** The user enters their email and password and clicks "Login."
+6. The system calls `signInWithPassword()` via Supabase Auth.
+7. Supabase Auth validates the credentials and returns a JWT session token and user data.
+8. The system queries the user's role from the database.
+9. The system redirects the user to the appropriate dashboard (Manager Dashboard or Resident Dashboard) based on their role.
+
+**Postcondition:** The user is authenticated and redirected to their role-specific dashboard. A valid JWT session token is stored in the browser.
+
+---
+
+#### UC-02: Manager Creates Monthly Dues
+
+| Field | Detail |
+|-------|--------|
+| **Use Case ID** | UC-02 |
+| **Use Case Name** | Manager Creates Monthly Dues |
+| **Actor(s)** | Manager |
+| **Precondition** | The manager is logged in and has access to the Manager Dashboard. Building units are already registered in the system. |
+
+**Main Flow:**
+1. The manager navigates to the "Add Dues" page from the dashboard.
+2. The system fetches all registered units from the database and displays them.
+3. The manager enters the dues amount and selects the target month.
+4. The system calculates the per-unit charges based on the entered amount.
+5. The manager reviews the dues breakdown and clicks "Create Dues."
+6. The system inserts dues records into the database for each unit.
+7. Supabase Realtime broadcasts the new dues to all connected resident clients.
+8. The system displays a success confirmation to the manager.
+
+**Postcondition:** Dues records are created for all units for the specified month. All connected residents receive a real-time notification of the new dues.
+
+---
+
+#### UC-03: Manager Confirms Payment
+
+| Field | Detail |
+|-------|--------|
+| **Use Case ID** | UC-03 |
+| **Use Case Name** | Manager Confirms Payment |
+| **Actor(s)** | Manager |
+| **Precondition** | The manager is logged in. A resident has previously notified the manager of a payment, and the payment record exists in the system with status "pending." |
+
+**Main Flow:**
+1. The manager navigates to the "Payments" section on the Manager Dashboard.
+2. The system displays a list of pending payment notifications from residents.
+3. The manager selects a specific payment to review.
+4. The system shows the payment details: resident name, unit number, amount, date, and month.
+5. The manager verifies the payment against actual bank records or receipts.
+6. **If verified:** The manager clicks "Confirm Payment." The system updates the payment status to "confirmed" and recalculates the unit's outstanding balance.
+7. **If not verified:** The manager clicks "Reject Payment." The system updates the payment status to "rejected" and notifies the resident.
+8. Supabase Realtime broadcasts the updated payment status to the resident.
+
+**Postcondition:** The payment status is updated to either "confirmed" or "rejected." The unit's balance is recalculated accordingly, and the resident is notified in real-time.
+
+---
+
+#### UC-04: Resident Submits Maintenance Request
+
+| Field | Detail |
+|-------|--------|
+| **Use Case ID** | UC-04 |
+| **Use Case Name** | Resident Submits Maintenance Request |
+| **Actor(s)** | Resident |
+| **Precondition** | The resident is logged in and has access to the Resident Dashboard. |
+
+**Main Flow:**
+1. The resident navigates to the "Maintenance" section on the Resident Dashboard.
+2. The resident clicks "New Request" to open the maintenance request form.
+3. The resident enters a description of the maintenance issue.
+4. The resident clicks "Submit Request."
+5. The system creates a new maintenance request record in the database with status "pending" and the current timestamp.
+6. The system displays a success confirmation with the request details.
+7. The manager later views the list of pending maintenance requests on the Manager Dashboard.
+8. The manager updates the request status to "in_progress" when work begins.
+9. The manager marks the request as "resolved" when the issue is fixed, and the `resolvedAt` timestamp is recorded.
+
+**Postcondition:** A maintenance request is created in the system with status "pending." The manager can view and manage the request lifecycle (pending -> in_progress -> resolved).
+
+---
+
+#### UC-05: Manager Posts Announcement
+
+| Field | Detail |
+|-------|--------|
+| **Use Case ID** | UC-05 |
+| **Use Case Name** | Manager Posts Announcement |
+| **Actor(s)** | Manager |
+| **Precondition** | The manager is logged in and has access to the Manager Dashboard. |
+
+**Main Flow:**
+1. The manager navigates to the "Announcements" section on the Manager Dashboard.
+2. The manager clicks "New Announcement" to open the announcement form.
+3. The manager enters a title and the announcement content.
+4. The manager clicks "Post Announcement."
+5. The system inserts the announcement record into the database with the current timestamp.
+6. Supabase Realtime broadcasts the new announcement to all connected clients.
+7. The system displays a success confirmation to the manager.
+8. All logged-in residents see the new announcement appear on their dashboard in real-time.
+
+**Postcondition:** The announcement is stored in the database and visible to all residents. Connected residents receive the announcement in real-time without page refresh.
+
 ---
