@@ -147,3 +147,50 @@ The system uses two primary communication patterns between the client and server
 2. **WebSocket (WSS):** Real-time updates are delivered through Supabase Realtime WebSocket subscriptions. When a manager creates new dues or confirms a payment, all connected clients receive the update instantly without requiring a page refresh. The frontend subscribes to relevant database table changes on component mount and automatically updates the UI when changes are detected.
 
 ---
+
+<!-- Sections 4-8 will be added by other team members in their respective branches -->
+
+## 9. Scenarios
+
+The Scenarios view (+1) describes the key use cases that drive and validate the architecture. Each use case demonstrates how the system's actors interact with HomeLink to accomplish their goals.
+
+### 9.1 Use Case Diagram
+
+*Figure 9.1 - HomeLink Use Case Diagram*
+
+```mermaid
+graph LR
+    Manager((Manager))
+    Resident((Resident))
+
+    UC1[UC-01: User Registration and Login]
+    UC2[UC-02: Create Monthly Dues]
+    UC3[UC-03: Confirm Payment]
+    UC4[UC-04: Submit Maintenance Request]
+    UC5[UC-05: Post Announcement]
+    UC6[UC-06: View All Units]
+    UC7[UC-07: View Balance and Dues]
+    UC8[UC-08: View Announcements]
+    UC9[UC-09: View Payment History]
+
+    Manager --- UC1
+    Manager --- UC2
+    Manager --- UC3
+    Manager --- UC5
+    Manager --- UC6
+
+    Resident --- UC1
+    Resident --- UC4
+    Resident --- UC7
+    Resident --- UC8
+    Resident --- UC9
+```
+
+### 9.2 Actors
+
+| Actor | Description |
+|-------|-------------|
+| **Manager** | The building administrator responsible for creating dues, confirming payments, posting announcements, and managing all building units. Has full administrative access to the system. |
+| **Resident** | A tenant living in one of the building units. Can view their dues and balance, notify the manager of payments, submit maintenance requests, and view announcements. |
+
+---
