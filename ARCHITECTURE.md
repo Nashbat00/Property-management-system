@@ -2,6 +2,25 @@
 
 ---
 
+## Executive Summary
+
+HomeLink is a web-based property management platform designed to digitize and streamline the administrative operations of residential buildings. This document presents the complete software architecture of HomeLink, following the **4+1 View Model** proposed by Philippe Kruchten (1995).
+
+The system adopts a **client-server architecture** with a **React 18 Single Page Application (SPA)** as the frontend and **Supabase** as the Backend-as-a-Service (BaaS), providing PostgreSQL database, JWT-based authentication, auto-generated REST API, and real-time WebSocket subscriptions. This architectural choice enables rapid development, minimal backend code, built-in security through Row Level Security (RLS), and zero-cost deployment on free-tier cloud services (Vercel + Supabase).
+
+Key architectural highlights:
+
+- **Two-tier client-server** architecture with clear separation of concerns
+- **Real-time data synchronization** via Supabase Realtime WebSocket subscriptions
+- **Role-based access control** enforced at both UI and database levels
+- **Stateless authentication** using JWT tokens with automatic session refresh
+- **Responsive, mobile-first** user interface using Tailwind CSS utility classes
+- **Zero-cost deployment** leveraging Vercel (frontend) and Supabase (backend) free tiers
+
+This document is intended for developers, stakeholders, course instructors, and future maintainers who need to understand the architectural decisions, trade-offs, and implementation structure of the HomeLink system.
+
+---
+
 ## Title Page
 
 | | |
