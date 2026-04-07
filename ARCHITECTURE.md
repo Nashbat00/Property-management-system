@@ -318,6 +318,35 @@ The authentication system uses Supabase Auth with JWT tokens:
 4. **Token Refresh:** Supabase JS client automatically refreshes expired tokens using the refresh token
 5. **Logout:** User clicks logout → `supabase.auth.signOut()` is called → Tokens are cleared → User redirected to login page
 
+### 3.7 Architecture Decision Records (ADRs)
+
+The following table documents the key architectural decisions made during the design of HomeLink, along with their rationale and trade-offs:
+
+| ID | Decision | Alternatives Considered | Rationale | Trade-offs |
+|----|----------|------------------------|-----------|------------|
+| ADR-001 | Use **Supabase** as BaaS instead of custom Node.js backend | Node.js + Express + PostgreSQL, Firebase, AWS Amplify | Eliminates boilerplate CRUD code, provides built-in auth and realtime, free tier is sufficient for v1 | Vendor lock-in; less control over server logic |
+| ADR-002 | Use **React 18 SPA** instead of server-side rendered app | Next.js (SSR), Remix, plain HTML/JS | Simpler deployment, better interactivity, no SEO requirements for internal tool | Slower initial load vs SSR; requires JavaScript enabled |
+| ADR-003 | Use **Tailwind CSS** instead of component library (Material UI, etc.) | Material UI, Chakra UI, Bootstrap | Utility-first approach gives full design control, smaller bundle size, easy responsive design | Longer class strings in JSX; learning curve for beginners |
+| ADR-004 | Use **Row Level Security (RLS)** for authorization | Backend middleware, frontend-only checks | Security enforced at database level, cannot be bypassed by tampering with frontend, aligns with BaaS approach | Requires writing SQL policies; harder to debug than middleware |
+| ADR-005 | Use **WebSocket subscriptions** for real-time updates | Polling, Server-Sent Events (SSE) | Instant updates, lower latency, native Supabase support, better user experience | Requires persistent connection; higher resource usage than polling |
+| ADR-006 | Use **Vercel** for deployment | Netlify, AWS S3 + CloudFront, GitHub Pages | Seamless GitHub integration, automatic previews for PRs, global CDN, free tier | Vendor-specific features (e.g., edge functions) not portable |
+| ADR-007 | Use **email/password auth** only in v1 | OAuth (Google, GitHub), magic links, phone OTP | Simpler implementation, no third-party dependencies, acceptable UX for internal building app | Users must remember passwords; no social proof of identity |
+| ADR-008 | Use **client-side routing** with React Router | Server-side routing, hash-based routing | Cleaner URLs, better SEO potential, standard SPA pattern | Requires deployment configuration for route rewriting |
+
+### 3.8 Quality Attributes Overview
+
+The architecture is designed to satisfy the following quality attributes (detailed in Section 11):
+
+| Attribute | Architectural Mechanism |
+|-----------|------------------------|
+| **Security** | JWT authentication, Row Level Security, HTTPS/WSS, password hashing by Supabase Auth |
+| **Performance** | Vercel CDN for static assets, PostgreSQL indexes, React component memoization |
+| **Scalability** | Stateless frontend, Supabase auto-scaling infrastructure, horizontal scaling ready |
+| **Maintainability** | Modular React component structure, separation of concerns, custom hooks |
+| **Usability** | Responsive Tailwind design, role-specific dashboards, real-time feedback |
+| **Reliability** | Try-catch error handling, managed Supabase infrastructure, automatic retries |
+| **Portability** | Standard web technologies, no native dependencies, runs in any modern browser |
+
 ---
 
 <!-- Sections 4-8 will be added by other team members in their respective branches -->
