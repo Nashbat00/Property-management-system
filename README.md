@@ -1,10 +1,48 @@
 # HomeLink - Property Management System
 
+![React](https://img.shields.io/badge/React-18-61DAFB?logo=react&logoColor=white)
+![Supabase](https://img.shields.io/badge/Supabase-BaaS-3ECF8E?logo=supabase&logoColor=white)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind-CSS-06B6D4?logo=tailwindcss&logoColor=white)
+![Vite](https://img.shields.io/badge/Vite-5-646CFF?logo=vite&logoColor=white)
+![Vercel](https://img.shields.io/badge/Deployed-Vercel-000000?logo=vercel&logoColor=white)
+![License](https://img.shields.io/badge/License-Academic-blue)
+![Course](https://img.shields.io/badge/Course-SWE332-orange)
+
+> A modern, real-time property management platform connecting building managers and residents through a seamless digital experience.
+
+## Table of Contents
+
+- [Project Overview](#project-overview)
+- [Problem Statement](#problem-statement)
+- [Key Features](#key-features)
+- [Team Members](#team-members)
+- [Technology Stack](#technology-stack)
+- [Architecture Documentation](#architecture-documentation)
+- [Project Structure](#project-structure)
+- [Database Schema](#database-schema)
+- [Getting Started](#getting-started)
+- [Git Workflow](#git-workflow)
+- [Course Information](#course-information)
+
 ## Project Overview
 
 HomeLink is a modern, web-based property management platform designed to streamline communication and administrative tasks between building managers and residents. The system provides a centralized digital solution for managing monthly dues, tracking payments, handling maintenance requests, and broadcasting announcements within a residential building.
 
 The application follows a **client-server architecture** built with **React 18** as the frontend single-page application (SPA), **Supabase** as the backend-as-a-service (BaaS) providing a PostgreSQL database, authentication, and real-time capabilities, **Tailwind CSS** for responsive utility-first styling, and **Vercel** for production deployment with CI/CD integration. Communication between the client and server is handled through **REST API** calls and **WebSocket** real-time subscriptions.
+
+## Problem Statement
+
+Traditional building management relies on paper-based records, group chats, and informal communication channels, leading to several critical problems:
+
+| Problem | Impact |
+|---------|--------|
+| **Opaque financial records** | Residents cannot verify dues calculations or payment history |
+| **Scattered communication** | Announcements get lost in group chats, reducing resident engagement |
+| **Manual payment tracking** | Managers spend hours reconciling payments manually, leading to errors |
+| **Unstructured maintenance requests** | Requests are forgotten, delayed, or ignored without a formal tracking system |
+| **No audit trail** | Disputes over payments and requests cannot be resolved objectively |
+
+**HomeLink solves these problems** by providing a centralized, real-time digital platform with role-based access, automated balance calculations, and a complete audit trail for all operations.
 
 ## Key Features
 
@@ -148,7 +186,23 @@ This project follows a **feature-branch workflow**:
 
 ## Course Information
 
-- **Course:** SWE332 - Software Architecture
-- **Semester:** Spring 2026
-- **Institution:** University
-- **Deadline:** Pull Requests by April 7-8, 2026 | Final Submission: April 10, 2026 - 17:00
+| | |
+|---|---|
+| **Course** | SWE332 - Software Architecture |
+| **Semester** | Spring 2026 |
+| **Assignment** | Part 2 - Architecture Documentation using 4+1 View Model |
+| **Team Size** | 5 Students |
+| **Pull Request Deadline** | April 7-8, 2026 |
+| **Final Submission** | April 10, 2026 - 17:00 |
+
+## Acknowledgments
+
+This project was developed as part of the SWE332 Software Architecture course. The architecture documentation follows the **4+1 View Model** proposed by Philippe Kruchten (1995), a widely adopted methodology for describing software architecture from multiple concurrent perspectives.
+
+## License
+
+This project is developed for academic purposes as part of the SWE332 course at the university. All rights reserved by the team members.
+
+---
+
+**Project Repository:** [https://github.com/Nashbat00/Property-management-system](https://github.com/Nashbat00/Property-management-system)
