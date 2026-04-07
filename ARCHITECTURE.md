@@ -301,7 +301,29 @@ The authentication system uses Supabase Auth with JWT tokens:
 
 ---
 
-<!-- Sections 4-8 will be added by other team members in their respective branches -->
+## 6. Process Architecture
+
+### 6.1. Key Processes
+[span_3](start_span)[span_4](start_span)The system focuses on several key processes to ensure secure and real-time management[span_3](end_span)[span_4](end_span).
+
+### 6.2. Sequence Diagram: User Login
+```mermaid
+sequenceDiagram
+    participant User
+    participant Frontend as React Frontend
+    participant Auth as Supabase Auth
+    participant DB as Supabase Database
+
+    User->>Frontend: Enter email/password
+    Frontend->>Auth: signInWithPassword()
+    Auth->>DB: Validate credentials
+    alt Valid credentials
+        Auth-->>Frontend: Session Token
+        Frontend-->>User: Show Dashboard
+    else Invalid credentials
+        Auth-->>Frontend: Error
+        Frontend-->>User: Show "Access Denied" message
+    end
 
 ## 9. Scenarios
 
