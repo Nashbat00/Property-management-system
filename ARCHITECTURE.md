@@ -54,6 +54,9 @@ This document is intended for developers, stakeholders, course instructors, and 
 | 0.4 | 2026-04-06 | Bager Diren Karakoyun | Added Use Case Diagram with 2 actors and 9 use cases |
 | 0.5 | 2026-04-06 | Bager Diren Karakoyun | Added 5 detailed use case descriptions (UC-01 through UC-05) |
 | 0.6 | 2026-04-06 | Bager Diren Karakoyun | Improved Section 3 with architecture diagram, technology mapping, and routing |
+| 0.7 | 2026-04-08 | Abdalrahman Mazen Ahmad Nashbat | Added Section 5.2 class diagram with 8 entities and 8 relationships |
+| 0.8 | 2026-04-08 | Abdalrahman Mazen Ahmad Nashbat | Added Section 5.1 logical architecture overview with entity descriptions |
+| 0.9 | 2026-04-08 | Abdalrahman Mazen Ahmad Nashbat | Added Section 5.3 key relationships with inheritance, association, composition semantics |
 
 ---
 
@@ -466,6 +469,31 @@ classDiagram
 ```
 
 The diagram above shows the 8 core domain entities of HomeLink, their attributes, methods, and the relationships that connect them. The model is centered around the `Unit` entity, which aggregates financial and maintenance data, while `User` is specialized into two subclasses (`Manager` and `Resident`) through inheritance.
+
+### 5.3 Key Relationships
+
+The table below summarizes the 8 relationships in the HomeLink class diagram, their UML type, and their meaning in the domain:
+
+| Relationship | Type | Description |
+|--------------|------|-------------|
+| `User <\|-- Manager` | Inheritance | `Manager` is a specialization of `User` and inherits the authentication attributes and methods (`login()`, `logout()`). |
+| `User <\|-- Resident` | Inheritance | `Resident` is a specialization of `User` and inherits the same authentication contract as `Manager`. |
+| `Manager "1" --> "*" Unit` | Association | A single `Manager` manages all units in the building. This is a one-to-many read relationship used by `viewAllUnits()`. |
+| `Resident "1" --> "1" Unit` | Association | Each `Resident` lives in exactly one `Unit`, and each `Unit` is occupied by one `Resident`. This link is used to filter dues and payments for the logged-in resident. |
+| `Unit "1" --> "*" Payment` | Composition | Every `Unit` owns a collection of `Payment` records. Payments cannot exist without a parent unit, so their lifecycle is bound to the unit (composition semantics). |
+| `Unit "1" --> "*" Dues` | Association | Each `Unit` is assigned a sequence of monthly `Dues` by the manager. Dues refer to a unit but are created independently in monthly batches, so the relationship is modeled as an association rather than composition. |
+| `Unit "1" --> "*" MaintenanceRequest` | Composition | Every `Unit` can raise multiple `MaintenanceRequest` records over time. A request is meaningful only in the context of its unit, so the lifecycle is composed. |
+| `Manager "1" --> "*" Announcement` | Association | The `Manager` is the sole author of `Announcement` entities. Announcements are broadcast to all residents and exist independently of any specific unit. |
+
+**Relationship Semantics:**
+
+- **Inheritance (`User <\|-- Manager`, `User <\|-- Resident`)** models the role-based authentication system. Both subclasses share the same identity and credential structure but override the behavior layer with role-specific operations. This allows the Supabase `users` table to be implemented as a single table with a `role` discriminator column.
+
+- **Association** is used whenever two entities are connected conceptually but can exist independently. For example, a `Dues` record refers to a `Unit`, but dues are generated in monthly batches by the manager and are meaningful on their own as financial records. Similarly, `Announcement` entities are authored by a `Manager` but are not owned by any specific unit.
+
+- **Composition** is used when a child entity's lifecycle is strictly tied to its parent. A `Payment` cannot exist without the `Unit` it is paying for, and a `MaintenanceRequest` is always raised against a specific unit. If a unit were ever removed, its payments and maintenance requests would logically be removed with it.
+
+- **Multiplicities** capture the cardinality of each relationship: `"1" --> "*"` means one-to-many (e.g., one unit has many payments), while `"1" --> "1"` means one-to-one (each resident lives in exactly one unit). These multiplicities are enforced at the database level through foreign key constraints and Row Level Security policies.
 
 ---
 
