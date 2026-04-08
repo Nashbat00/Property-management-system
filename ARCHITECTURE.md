@@ -127,7 +127,50 @@ This document is intended for:
 - **Maintainers** who will extend, modify, or debug the system in the future
 - **New Team Members** who need to onboard quickly and understand the system's design rationale
 
-### 1.4 Scope Boundaries
+### 1.4 Document Conventions
+
+The following conventions are used throughout this document to ensure clarity and consistency:
+
+**Typography:**
+
+| Notation | Meaning | Example |
+|----------|---------|---------|
+| `code` | Technical identifiers (class names, table names, methods, endpoints) | `signInWithPassword()`, `users` table |
+| **Bold** | Key terms, component names, or emphasis | **React SPA**, **Supabase Auth** |
+| *Italic* | Figure captions, references to external documents, subtle emphasis | *Figure 3.1*, *Kruchten (1995)* |
+| `UPPERCASE` | HTTP methods, SQL keywords | `GET`, `POST`, `SELECT` |
+
+**Diagrams:**
+
+All diagrams in this document are written in **Mermaid** syntax, which renders natively on GitHub. Mermaid was chosen over image files for the following reasons:
+
+- **Version control friendly** - Diagrams are plain text and can be diffed
+- **Easy to maintain** - No need for external tools (draw.io, Lucidchart, etc.)
+- **GitHub native rendering** - Diagrams display automatically in `.md` files
+- **Collaborative editing** - Team members can edit diagrams without design software
+
+**Identifiers:**
+
+- **Use Case IDs:** `UC-XX` (e.g., `UC-01`, `UC-02`)
+- **Business Rule IDs:** `BR-XX` (e.g., `BR-01`, `BR-02`)
+- **Architecture Decision Record IDs:** `ADR-XXX` (e.g., `ADR-001`, `ADR-002`)
+- **Figure IDs:** `Figure X.Y` where `X` is the section number and `Y` is the sequence within the section
+
+**Terminology:**
+
+Throughout this document, the following terms are used with specific meanings:
+
+| Term | Definition |
+|------|-----------|
+| **Manager** | A user with the role "manager", representing a building administrator with full system access |
+| **Resident** | A user with the role "resident", representing a building tenant with limited, unit-scoped access |
+| **Unit** | An individual apartment or housing unit within the building |
+| **Dues** | Monthly maintenance fees charged to each unit |
+| **Payment** | A record of money paid by a resident toward their dues |
+| **Announcement** | A building-wide message posted by the manager |
+| **Maintenance Request** | A report of a physical issue in a unit or common area submitted by a resident |
+
+### 1.5 Scope Boundaries
 
 The following table clarifies what is included and excluded from the scope of HomeLink v1:
 
