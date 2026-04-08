@@ -355,6 +355,39 @@ The architecture is designed to satisfy the following quality attributes (detail
 
 The Logical View describes the system's object-oriented decomposition into classes and entities. It focuses on the key abstractions of the HomeLink domain and their structural relationships, answering the question: *"What are the key abstractions in the system?"*
 
+### 5.1 Overview
+
+The HomeLink domain model consists of 8 core entities that together capture all the state and behavior required to operate a residential building management system. The table below summarizes each entity, its attributes, and the methods it exposes:
+
+| Entity | Attributes | Methods |
+|--------|-----------|---------|
+| **User** | id, email, password, fullName, role | login(), logout() |
+| **Manager** | (inherits from User) | createDues(), confirmPayment(), postAnnouncement(), viewAllUnits() |
+| **Resident** | (inherits from User) | viewBalance(), viewDues(), submitMaintenanceRequest(), viewAnnouncements() |
+| **Unit** | id, unitNumber, floor, currentBalance | - |
+| **Payment** | id, paymentDate, amount, status, month | - |
+| **Dues** | id, amount, month, createdAt | - |
+| **Announcement** | id, title, content, createdAt | - |
+| **MaintenanceRequest** | id, description, status, createdAt, resolvedAt | - |
+
+**Entity Descriptions:**
+
+- **User** is the base abstraction for anyone who can authenticate into HomeLink. It stores identity (`id`, `email`, `fullName`), credentials (`password`), and a `role` discriminator that determines whether the user is a Manager or Resident. It exposes the authentication behaviors `login()` and `logout()` which are inherited by both subclasses.
+
+- **Manager** is a specialization of User representing the building administrator. It adds administrative behaviors: `createDues()` to assign monthly charges to all units, `confirmPayment()` to approve resident payments, `postAnnouncement()` to broadcast messages to residents, and `viewAllUnits()` to access the global view of the building.
+
+- **Resident** is a specialization of User representing a tenant living in a unit. It exposes tenant-facing behaviors: `viewBalance()` and `viewDues()` to check financial obligations, `submitMaintenanceRequest()` to report issues in the building, and `viewAnnouncements()` to read manager broadcasts.
+
+- **Unit** represents a single apartment in the building. It is the central entity of the financial model: each unit has a `unitNumber`, a `floor`, and a `currentBalance` that is continuously recalculated as dues are created and payments are confirmed.
+
+- **Payment** records a single financial transaction made by a resident toward a unit's balance. It captures the `paymentDate`, the `amount` paid, the `month` the payment is for, and a `status` that transitions through the values `pending` → `confirmed` / `rejected` depending on manager verification.
+
+- **Dues** represents a monthly charge assigned to a unit. It stores the `amount` owed, the target `month`, and the `createdAt` timestamp when the manager generated the charge.
+
+- **Announcement** represents a message broadcast by the manager to all residents. It has a `title`, free-form `content`, and a `createdAt` timestamp used for chronological sorting on the dashboard.
+
+- **MaintenanceRequest** represents an issue reported by a resident about their unit or a shared area. It tracks a free-text `description`, a lifecycle `status` (`pending` → `in_progress` → `resolved`), a `createdAt` timestamp, and a `resolvedAt` timestamp that is set only when the manager marks the request as resolved.
+
 ### 5.2 Class Diagram
 
 *Figure 5.1 - HomeLink Class Diagram*
