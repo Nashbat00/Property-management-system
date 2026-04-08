@@ -351,6 +351,91 @@ The architecture is designed to satisfy the following quality attributes (detail
 
 <!-- Sections 4-8 will be added by other team members in their respective branches -->
 
+## 5. Logical View
+
+The Logical View describes the system's object-oriented decomposition into classes and entities. It focuses on the key abstractions of the HomeLink domain and their structural relationships, answering the question: *"What are the key abstractions in the system?"*
+
+### 5.2 Class Diagram
+
+*Figure 5.1 - HomeLink Class Diagram*
+
+```mermaid
+classDiagram
+    class User {
+        +String id
+        +String email
+        +String password
+        +String fullName
+        +String role
+        +login()
+        +logout()
+    }
+
+    class Manager {
+        +createDues()
+        +confirmPayment()
+        +postAnnouncement()
+        +viewAllUnits()
+    }
+
+    class Resident {
+        +viewBalance()
+        +viewDues()
+        +submitMaintenanceRequest()
+        +viewAnnouncements()
+    }
+
+    class Unit {
+        +String id
+        +String unitNumber
+        +int floor
+        +double currentBalance
+    }
+
+    class Payment {
+        +String id
+        +Date paymentDate
+        +double amount
+        +String status
+        +String month
+    }
+
+    class Dues {
+        +String id
+        +double amount
+        +String month
+        +Date createdAt
+    }
+
+    class Announcement {
+        +String id
+        +String title
+        +String content
+        +Date createdAt
+    }
+
+    class MaintenanceRequest {
+        +String id
+        +String description
+        +String status
+        +Date createdAt
+        +Date resolvedAt
+    }
+
+    User <|-- Manager
+    User <|-- Resident
+    Manager "1" --> "*" Unit : manages
+    Resident "1" --> "1" Unit : lives in
+    Unit "1" --> "*" Payment : has
+    Unit "1" --> "*" Dues : owes
+    Unit "1" --> "*" MaintenanceRequest : reports
+    Manager "1" --> "*" Announcement : posts
+```
+
+The diagram above shows the 8 core domain entities of HomeLink, their attributes, methods, and the relationships that connect them. The model is centered around the `Unit` entity, which aggregates financial and maintenance data, while `User` is specialized into two subclasses (`Manager` and `Resident`) through inheritance.
+
+---
+
 ## 9. Scenarios
 
 The Scenarios view (+1) describes the key use cases that drive and validate the architecture. Each use case demonstrates how the system's actors interact with HomeLink to accomplish their goals. The scenarios serve as the connecting thread between all four architectural views, showing how the logical entities, runtime processes, development components, and physical infrastructure work together to deliver user-facing functionality.
