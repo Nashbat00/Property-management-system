@@ -404,7 +404,24 @@ graph LR
 | UC-04 | Resident Submits Maintenance Request | Resident | MaintenanceRequest | Resident encounters a maintenance issue |
 | UC-05 | Manager Posts Announcement | Manager | Announcement | Manager needs to communicate with residents |
 
-### 9.4 Detailed Use Cases
+### 9.4 Business Rules
+
+The following business rules govern the behavior of HomeLink and are enforced throughout the use cases:
+
+| ID | Rule | Enforcement Level |
+|----|------|-------------------|
+| BR-01 | A user must be authenticated before accessing any dashboard or performing any action | Frontend (ProtectedRoute) + Backend (RLS) |
+| BR-02 | Only users with the role "manager" can create dues, confirm payments, or post announcements | Backend (RLS policies) |
+| BR-03 | A resident can only view and modify their own unit's data (balance, payments, maintenance requests) | Backend (RLS policies using `auth.uid()`) |
+| BR-04 | Monthly dues can only be created once per month per unit to prevent duplicate charges | Application logic (pre-insert check) |
+| BR-05 | A payment cannot be confirmed if its amount is negative or zero | Frontend validation + Backend check constraint |
+| BR-06 | A maintenance request description must be at least 10 characters long | Frontend validation |
+| BR-07 | Announcements must have both a non-empty title and content | Frontend validation + Backend NOT NULL constraints |
+| BR-08 | When a payment is confirmed, the unit's balance must be recalculated atomically | Application logic (transaction) |
+| BR-09 | Deleted users (soft delete) cannot log in but their historical records are preserved | Backend (RLS + `deleted_at` column) |
+| BR-10 | All timestamps (`createdAt`, `resolvedAt`, `paymentDate`) are stored in UTC | Database default (`TIMESTAMPTZ`) |
+
+### 9.5 Detailed Use Cases
 
 #### UC-01: User Registration and Login
 
