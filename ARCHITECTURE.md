@@ -340,8 +340,9 @@ sequenceDiagram
     Frontend->>DB: Save dues records
     DB->>Realtime: Notify changes
     Realtime-->>Frontend: Alert all residents
+```
 
-### 6.4 Sequence Diagram: Maintenance Request
+### 6.4. Sequence Diagram: Maintenance Request
 ```mermaid
 sequenceDiagram
     participant Resident
@@ -354,6 +355,7 @@ sequenceDiagram
     Note over DB, Manager: Manager sees pending requests
     Manager->>DB: Update status to "in_progress"
     Manager->>DB: Update status to "resolved"
+```
 ## 9. Scenarios
 
 The Scenarios view (+1) describes the key use cases that drive and validate the architecture. Each use case demonstrates how the system's actors interact with HomeLink to accomplish their goals. The scenarios serve as the connecting thread between all four architectural views, showing how the logical entities, runtime processes, development components, and physical infrastructure work together to deliver user-facing functionality.
