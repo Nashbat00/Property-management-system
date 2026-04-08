@@ -668,3 +668,26 @@ The following matrix shows how each use case relates to the architectural views 
 | UC-09 | Resident, Payment | View payments flow | `payments/` | PostgREST GET (filtered) |
 
 ---
+
+
+
+## 7 Development View
+
+### 7.1 Technology Stack
+
+| Layer            | Technology              | Purpose                              |
+|------------------|------------------------|--------------------------------------|
+| Frontend         | React 18               | Component-based UI development       |
+| Styling          | Tailwind CSS           | Utility-first CSS framework          |
+| Backend / DB     | Supabase (PostgreSQL)  | Data storage + auto REST API         |
+| Authentication   | Supabase Auth          | User registration, login, sessions   |
+| Real-time        | Supabase Realtime      | WebSocket-based live updates         |
+| Hosting          | Vercel                 | Static site hosting with CI/CD       |
+| Version Control  | GitHub                 | Source code + Git history            |
+| Language         | JavaScript (ES6+)      | Core programming language            |
+
+
+
+
+
+
