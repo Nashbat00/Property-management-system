@@ -309,22 +309,51 @@ The authentication system uses Supabase Auth with JWT tokens:
 ### 6.2. Sequence Diagram: User Login
 ```mermaid
 sequenceDiagram
-    participant User
-    participant Frontend as React Frontend
-    participant Auth as Supabase Auth
+actor U as User
+participant F as React Frontend
+participant A as Supabase Auth
+participant D as Supabase Database
+U->>F: Enter email and password
+F->>A: signInWithPassword(email, password)
+A->>A: Validate credentials
+alt Valid credentials
+A-->>F: Return session token + user data
+F->>D: Query user role
+D-->>F: Return role information
+F-->>U: Display Dashboard
+else Invalid credentials
+A-->>F: Return authentication error
+F-->>U: Display error message
+end
+```
+### 6.3. Sequence Diagram: Add Dues
+```mermaid
+sequenceDiagram
+    participant Manager
+    participant Frontend
     participant DB as Supabase Database
+    participant Realtime as Supabase Realtime
 
-    User->>Frontend: Enter email/password
-    Frontend->>Auth: signInWithPassword()
-    Auth->>DB: Validate credentials
-    alt Valid credentials
-        Auth-->>Frontend: Session Token
-        Frontend-->>User: Show Dashboard
-    else Invalid credentials
-        Auth-->>Frontend: Error
-        Frontend-->>User: Show "Access Denied" message
-    end
+    Manager->>Frontend: Navigate to Add Dues
+    Frontend->>DB: Fetch all units
+    Manager->>Frontend: Select amount and month
+    Frontend->>DB: Save dues records
+    DB->>Realtime: Notify changes
+    Realtime-->>Frontend: Alert all residents
 
+### 6.4 Sequence Diagram: Maintenance Request
+```mermaid
+sequenceDiagram
+    participant Resident
+    participant Frontend
+    participant DB as Supabase Database
+    participant Manager
+
+    Resident->>Frontend: Fill and submit form
+    Frontend->>DB: Save with "pending" status
+    Note over DB, Manager: Manager sees pending requests
+    Manager->>DB: Update status to "in_progress"
+    Manager->>DB: Update status to "resolved"
 ## 9. Scenarios
 
 The Scenarios view (+1) describes the key use cases that drive and validate the architecture. Each use case demonstrates how the system's actors interact with HomeLink to accomplish their goals. The scenarios serve as the connecting thread between all four architectural views, showing how the logical entities, runtime processes, development components, and physical infrastructure work together to deliver user-facing functionality.
