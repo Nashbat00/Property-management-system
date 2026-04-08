@@ -559,3 +559,69 @@ The following business rules govern the behavior of HomeLink and are enforced th
 **Postcondition:** The announcement is stored in the database and visible to all residents. Connected residents receive the announcement in real-time without page refresh.
 
 ---
+
+### 9.6 Extended Use Cases (Brief)
+
+The following use cases represent secondary interactions that support the primary use cases above. They are described briefly for completeness.
+
+#### UC-06: Manager Views All Units
+
+| Field | Detail |
+|-------|--------|
+| **Actor** | Manager |
+| **Precondition** | Manager is authenticated. |
+| **Flow** | Manager opens the "Units" page → System fetches all units from the `units` table → Each unit is displayed with its unit number, floor, current balance, and resident name → Manager can click a unit to see detailed payment history. |
+| **Postcondition** | Manager sees a complete overview of all building units and their financial status. |
+
+---
+
+#### UC-07: Resident Views Balance and Dues
+
+| Field | Detail |
+|-------|--------|
+| **Actor** | Resident |
+| **Precondition** | Resident is authenticated and assigned to a unit. |
+| **Flow** | Resident opens the dashboard → System queries the `units` table for the resident's unit → Current balance is displayed prominently → System queries the `dues` table filtered by `unit_id` → All historical and current dues are shown in a sortable table. |
+| **Postcondition** | Resident has a clear view of their financial standing, including outstanding balance and dues history. |
+
+---
+
+#### UC-08: Resident Views Announcements
+
+| Field | Detail |
+|-------|--------|
+| **Actor** | Resident |
+| **Precondition** | Resident is authenticated. |
+| **Flow** | Resident navigates to the "Announcements" tab → System fetches all announcements sorted by `createdAt` descending → Each announcement card shows title, content, and post date → Resident subscribes to the `announcements` table for real-time updates → New announcements appear automatically at the top of the list without refresh. |
+| **Postcondition** | Resident reads all current and past announcements from the building manager. |
+
+---
+
+#### UC-09: Resident Views Payment History
+
+| Field | Detail |
+|-------|--------|
+| **Actor** | Resident |
+| **Precondition** | Resident is authenticated and has made at least one payment notification. |
+| **Flow** | Resident opens the "Payments" page → System fetches all payments from the `payments` table filtered by the resident's `unit_id` → Each payment is displayed with amount, date, month, and status badge (pending/confirmed/rejected) → Resident can filter by status or sort by date. |
+| **Postcondition** | Resident has full visibility of all their past payment notifications and their current statuses. |
+
+---
+
+### 9.7 Use Case Traceability Matrix
+
+The following matrix shows how each use case relates to the architectural views in the other sections of this document:
+
+| Use Case | Logical View (Entities) | Process View (Workflow) | Development View (Modules) | Physical View (Infrastructure) |
+|----------|------------------------|------------------------|---------------------------|-------------------------------|
+| UC-01 | User, Manager, Resident | Login sequence | `auth/`, `lib/supabase.js` | Supabase Auth, JWT |
+| UC-02 | Manager, Unit, Dues | Create dues sequence | `dues/`, `pages/DuesPage` | PostgreSQL INSERT, Realtime broadcast |
+| UC-03 | Manager, Payment, Unit | Confirm payment sequence | `payments/`, `pages/PaymentsPage` | PostgREST PATCH, Realtime broadcast |
+| UC-04 | Resident, MaintenanceRequest | Submit maintenance sequence | `maintenance/`, `pages/MaintenancePage` | PostgreSQL INSERT |
+| UC-05 | Manager, Announcement | Post announcement sequence | `announcements/`, `pages/AnnouncementsPage` | PostgreSQL INSERT, Realtime broadcast |
+| UC-06 | Manager, Unit | View units flow | `dashboard/ManagerDashboard` | PostgREST GET |
+| UC-07 | Resident, Unit, Dues | View balance flow | `dashboard/ResidentDashboard` | PostgREST GET |
+| UC-08 | Resident, Announcement | View announcements flow | `announcements/` | PostgREST GET + Realtime SUB |
+| UC-09 | Resident, Payment | View payments flow | `payments/` | PostgREST GET (filtered) |
+
+---
