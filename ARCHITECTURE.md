@@ -78,7 +78,8 @@ This document is intended for developers, stakeholders, course instructors, and 
 
 | Figure # | Title | Section |
 |----------|-------|---------|
-| Figure 3.1 | High-Level System Architecture Diagram | Section 3.3 |
+| Figure 3.1 | System Context Diagram | Section 3.1 |
+| Figure 3.2 | High-Level System Architecture Diagram | Section 3.4 |
 | Figure 5.1 | Class Diagram | Section 5.2 |
 | Figure 6.1 | Sequence Diagram - User Login | Section 6.2 |
 | Figure 6.2 | Sequence Diagram - Add Dues | Section 6.3 |
@@ -261,7 +262,56 @@ The following references were used in the preparation of this document and the d
 
 ## 3. Software Architecture
 
-### 3.1 Overview
+### 3.1 System Context
+
+Before diving into internal architecture, it is important to understand HomeLink's context within its external environment. The system context diagram below illustrates the HomeLink system and its interactions with external actors and systems.
+
+*Figure 3.1 - HomeLink System Context Diagram*
+
+```mermaid
+graph TB
+    Manager([Building Manager])
+    Resident([Resident])
+    Browser[Web Browser]
+
+    subgraph HomeLinkSystem["HomeLink System Boundary"]
+        App["HomeLink Application<br/>(React SPA + Supabase BaaS)"]
+    end
+
+    GitHub[GitHub<br/>Source Control]
+    Vercel[Vercel<br/>Hosting Platform]
+    SupabaseCloud[Supabase Cloud<br/>BaaS Provider]
+
+    Manager -->|"Uses"| Browser
+    Resident -->|"Uses"| Browser
+    Browser <-->|"HTTPS / WSS"| App
+
+    App -.->|"Deployed to"| Vercel
+    App -.->|"Backed by"| SupabaseCloud
+    GitHub -.->|"Deploys via CI/CD"| Vercel
+
+    classDef external fill:#e1f5ff,stroke:#0288d1,stroke-width:2px
+    classDef internal fill:#fff9c4,stroke:#f57c00,stroke-width:2px
+    classDef user fill:#c8e6c9,stroke:#388e3c,stroke-width:2px
+
+    class GitHub,Vercel,SupabaseCloud external
+    class App internal
+    class Manager,Resident user
+```
+
+**Context Elements:**
+
+| Element | Type | Description |
+|---------|------|-------------|
+| **Building Manager** | Primary Actor | Administrative user who interacts with the system to manage dues, payments, and announcements |
+| **Resident** | Primary Actor | End user who views their balance, submits maintenance requests, and reads announcements |
+| **Web Browser** | Client | Chrome, Firefox, Safari, or Edge - hosts the React SPA |
+| **HomeLink Application** | System Under Design | The React frontend and Supabase backend that deliver all functionality |
+| **GitHub** | External System | Version control and source code hosting; triggers CI/CD on push |
+| **Vercel** | External System | Hosting platform that serves the static SPA via global CDN |
+| **Supabase Cloud** | External System | BaaS provider offering PostgreSQL, Auth, Realtime, and Storage |
+
+### 3.2 Overview
 
 HomeLink follows a **client-server architecture** where the frontend is a React-based Single Page Application (SPA) and the backend services are provided by Supabase, a Backend-as-a-Service (BaaS) platform. This architecture enables rapid development with minimal backend code, as Supabase automatically generates REST APIs from the PostgreSQL database schema, handles user authentication, and provides real-time data synchronization through WebSocket connections.
 
@@ -273,7 +323,7 @@ The key architectural decision to use Supabase as a BaaS instead of building a c
 - **Row Level Security** - Database-level access control ensures data isolation between roles
 - **Free tier availability** - Sufficient resources for the project's scale (v1)
 
-### 3.2 The 4+1 View Model
+### 3.3 The 4+1 View Model
 
 This document organizes the HomeLink architecture using the **4+1 Architectural View Model** defined by Philippe Kruchten. Each view captures a different aspect of the system:
 
@@ -285,11 +335,11 @@ This document organizes the HomeLink architecture using the **4+1 Architectural 
 | **Physical View** | Maps software components to the physical infrastructure, showing deployment topology, network communication, and cloud services. | Deployment Diagram | Section 8 |
 | **Scenarios (+1)** | Describes the most important use cases that drive and validate the architecture. Use cases connect all four views and demonstrate how they work together. | Use Case Diagram | Section 9 |
 
-### 3.3 Architectural Style
+### 3.4 Architectural Style
 
 HomeLink uses a **two-tier client-server architecture**:
 
-*Figure 3.1 - High-Level System Architecture Diagram*
+*Figure 3.2 - High-Level System Architecture Diagram*
 
 ```mermaid
 graph TB
@@ -355,7 +405,7 @@ graph TB
 | CI/CD | Vercel + GitHub Integration | Automatic deployment on `git push` to main |
 | Domain | Vercel Domains | Custom domain management and SSL certificates |
 
-### 3.4 Communication Patterns
+### 3.5 Communication Patterns
 
 The system uses two primary communication patterns between the client and server:
 
@@ -387,7 +437,7 @@ Real-time updates are delivered through Supabase Realtime WebSocket subscription
 
 When a subscribed event occurs, the React component re-fetches the relevant data and re-renders the UI without requiring a page refresh.
 
-### 3.5 Routing Structure
+### 3.6 Routing Structure
 
 HomeLink uses client-side routing with React Router v6. The application defines the following routes:
 
@@ -406,7 +456,7 @@ HomeLink uses client-side routing with React Router v6. The application defines 
 
 All protected routes are wrapped in a `ProtectedRoute` component that checks for a valid JWT session and verifies the user's role before rendering the page.
 
-### 3.6 Authentication Flow
+### 3.7 Authentication Flow
 
 The authentication system uses Supabase Auth with JWT tokens:
 
@@ -416,7 +466,7 @@ The authentication system uses Supabase Auth with JWT tokens:
 4. **Token Refresh:** Supabase JS client automatically refreshes expired tokens using the refresh token
 5. **Logout:** User clicks logout → `supabase.auth.signOut()` is called → Tokens are cleared → User redirected to login page
 
-### 3.7 Architecture Decision Records (ADRs)
+### 3.8 Architecture Decision Records (ADRs)
 
 The following table documents the key architectural decisions made during the design of HomeLink, along with their rationale and trade-offs:
 
@@ -431,7 +481,7 @@ The following table documents the key architectural decisions made during the de
 | ADR-007 | Use **email/password auth** only in v1 | OAuth (Google, GitHub), magic links, phone OTP | Simpler implementation, no third-party dependencies, acceptable UX for internal building app | Users must remember passwords; no social proof of identity |
 | ADR-008 | Use **client-side routing** with React Router | Server-side routing, hash-based routing | Cleaner URLs, better SEO potential, standard SPA pattern | Requires deployment configuration for route rewriting |
 
-### 3.8 Quality Attributes Overview
+### 3.9 Quality Attributes Overview
 
 The architecture is designed to satisfy the following quality attributes (detailed in Section 11):
 
