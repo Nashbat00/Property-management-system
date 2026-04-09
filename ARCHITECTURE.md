@@ -304,7 +304,7 @@ The authentication system uses Supabase Auth with JWT tokens:
 ## 6. Process Architecture
 
 ### 6.1. Key Processes
-[span_3](start_span)[span_4](start_span)The system focuses on several key processes to ensure secure and real-time management[span_3](end_span)[span_4](end_span).
+The system focuses on several key processes to ensure secure and real-time management
 
 ### 6.2. Sequence Diagram: User Login
 ```mermaid
@@ -315,10 +315,10 @@ participant A as Supabase Auth
 participant D as Supabase Database
 U->>F: Enter email and password
 F->>A: signInWithPassword(email, password)
-A->>A: Validate credentials
+A-->>A: Validate credentials
 alt Valid credentials
 A-->>F: Return session token + user data
-F->>D: Query user role
+F-->>D: Query user role
 D-->>F: Return role information
 F-->>U: Display Dashboard
 else Invalid credentials
@@ -345,17 +345,59 @@ sequenceDiagram
 ### 6.4. Sequence Diagram: Maintenance Request
 ```mermaid
 sequenceDiagram
-    participant Resident
-    participant Frontend
+    participant R as Resident
+    participant F as Frontend
     participant DB as Supabase Database
-    participant Manager
+    participant M as Manager
 
-    Resident->>Frontend: Fill and submit form
-    Frontend->>DB: Save with "pending" status
-    Note over DB, Manager: Manager sees pending requests
-    Manager->>DB: Update status to "in_progress"
-    Manager->>DB: Update status to "resolved"
+    R->>F: Fill and submit form
+    F->>DB: Save with "pending" status
+    DB-->>F: Confirm save
+    F-->>R: Request submitted successfully
+
+    Note over M, F: Review Process
+    M->>F: Open dashboard
+    F->>DB: Fetch "pending" requests
+    M->>F: Update status to "in_progress"
+    F->>DB: Update record
+    M->>F: Update status to "resolved"
+    F->>DB: Update record
+    DB-->>F: Notify Resident (via Realtime/Email)
 ```
+### 6.5. Activity Diagram: Payment Flow
+```mermaid
+flowchart TD
+    Start([Start]) --> CreateDues[Manager creates monthly dues]
+    CreateDues --> Calculate[System calculates per-unit charges]
+    Calculate --> Assign[Dues assigned to all units]
+    Assign --> ViewBalance[Resident views outstanding balance]
+    
+    ViewBalance --> Decision1{Does the resident make a payment?}
+    
+    Decision1 -- No --> Unpaid[Balance remains unpaid]
+    Unpaid --> ViewBalance
+    
+    Decision1 -- Yes --> Notify[Resident notifies manager]
+    Notify --> Review[Manager reviews payment]
+    
+    Review --> Decision2{Is the payment verified?}
+    
+    Decision2 -- No --> Reject[Manager rejects, notifies resident]
+    Reject --> ViewBalance
+    
+    Decision2 -- Yes --> Settle[Mark as settled]
+    Settle --> UpdateBalance[Update balance]
+    UpdateBalance --> Record[Record in history]
+    Record --> End([End])
+```
+### 6.6. Concurrency and Real-time Behavior
+
+Supabase Realtime uses WebSocket connections for live data updates.
+When a manager updates dues or confirms a payment, all connected clients receive the update instantly.
+The frontend subscribes to relevant table changes on component mount.
+This ensures that no manual page refresh is needed, as the UI updates automatically.
+This architecture guarantees data consistency across all active sessions.
+
 ## 9. Scenarios
 
 The Scenarios view (+1) describes the key use cases that drive and validate the architecture. Each use case demonstrates how the system's actors interact with HomeLink to accomplish their goals. The scenarios serve as the connecting thread between all four architectural views, showing how the logical entities, runtime processes, development components, and physical infrastructure work together to deliver user-facing functionality.
