@@ -818,3 +818,16 @@ API --> Database
 
 GitHub --> CDN
 ```
+### 8.2 Deployment Topology
+
+The system uses a fully cloud-based and serverless deployment architecture. The client tier consists of users accessing the application through desktop and mobile browsers. The frontend is delivered using Vercel’s CDN, which ensures fast and reliable distribution of static assets. The backend tier is provided by Supabase running on AWS infrastructure, offering authentication, database, API, and real-time services. CI/CD is managed through GitHub, where code updates trigger automatic deployments to Vercel.
+
+### 8.3 Network Communication
+
+| Connection                   | Protocol         | Purpose                           |
+|-----------------------------|------------------|-----------------------------------|
+| Browser <-> Vercel         | HTTPS            | Serve static frontend assets      |
+| Browser <-> Supabase API   | HTTPS (REST)     | CRUD operations on DB tables      |
+| Browser <-> Supabase Realtime | WSS (WebSocket) | Live data updates to clients      |
+| Browser <-> Supabase Auth  | HTTPS            | User registration and login       |
+| GitHub <-> Vercel          | Webhook (HTTPS)  | Trigger automated deployments     |
