@@ -777,3 +777,44 @@ GitHubRepo --> VercelCDN
 5. Vercel detects the update through the GitHub webhook and starts automatic deployment.
 6. The production website is updated at the public URL within seconds.
 
+### 8.1 Deployment Diagram
+
+```mermaid
+graph TD
+
+subgraph ClientDevices
+    Desktop[Desktop Browser]
+    Mobile[Mobile Browser]
+end
+
+subgraph VercelCloud
+    CDN[Vercel CDN]
+    StaticHosting[Static File Hosting]
+    ReactBundle[React SPA Bundle]
+end
+
+subgraph SupabaseCloud
+    AuthService[Auth Service]
+    Database[PostgreSQL Database]
+    Realtime[Realtime Server]
+    API[PostgREST API]
+end
+
+subgraph Development
+    GitHub[GitHub Repository]
+end
+
+Desktop --> CDN
+Mobile --> CDN
+
+CDN --> StaticHosting
+StaticHosting --> ReactBundle
+
+ReactBundle --> API
+ReactBundle --> AuthService
+ReactBundle --> Realtime
+
+API --> Database
+
+GitHub --> CDN
+```
