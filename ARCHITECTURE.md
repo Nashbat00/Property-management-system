@@ -199,6 +199,47 @@ The following table clarifies what is included and excluded from the scope of Ho
 | Text-based announcements | Rich media announcements (images, videos, files) |
 | Desktop and mobile responsive web app | Native iOS/Android mobile applications |
 
+### 1.7 Assumptions and Dependencies
+
+The HomeLink architecture is based on the following assumptions and external dependencies. A change in any of these assumptions may require architectural revisions.
+
+**Assumptions:**
+
+| ID | Assumption | Impact if Invalid |
+|----|-----------|-------------------|
+| A-01 | All users have access to a modern web browser with JavaScript enabled | System becomes inaccessible; native app required |
+| A-02 | Users have reliable internet connectivity for real-time features | Real-time updates fail; offline mode needed |
+| A-03 | The target building has fewer than 100 residents | Free tier limits exceeded; paid plan required |
+| A-04 | Manager is a trusted actor who will not abuse administrative privileges | Additional audit logging and approval workflows required |
+| A-05 | Payments are verified manually against bank records by the manager | Payment gateway integration required (PCI compliance) |
+| A-06 | English is the primary language for the user interface | Internationalization (i18n) support required |
+
+**External Dependencies:**
+
+| Dependency | Provider | Risk Level | Mitigation |
+|-----------|---------|-----------|-----------|
+| **Supabase** (Auth, DB, Realtime) | Supabase Inc. | High (vendor lock-in) | Database schema is portable; could migrate to self-hosted PostgreSQL |
+| **Vercel** (Hosting, CI/CD) | Vercel Inc. | Medium | Static files can be hosted on any CDN (Netlify, Cloudflare Pages) |
+| **React 18** | Meta (Facebook) | Low | Stable, widely adopted, LTS support |
+| **Tailwind CSS** | Tailwind Labs | Low | Compiled to standard CSS; no runtime dependency |
+| **Vite** | Vue.js team | Low | Alternative bundlers (Webpack, Parcel) available |
+| **GitHub** | GitHub Inc. | Low | Can migrate to GitLab, Bitbucket if needed |
+
+### 1.8 Risks and Mitigation Strategies
+
+The following risks have been identified and mitigation strategies have been defined to address them:
+
+| Risk ID | Description | Likelihood | Impact | Mitigation Strategy |
+|---------|------------|-----------|--------|---------------------|
+| R-01 | Supabase free tier limits exceeded due to unexpected growth | Low | High | Monitor usage metrics; upgrade to paid tier if needed |
+| R-02 | Data loss due to accidental deletion or database corruption | Low | Critical | Supabase automatic daily backups; manual exports before major changes |
+| R-03 | Unauthorized access due to leaked JWT tokens | Medium | High | Short token expiration (1 hour); refresh token rotation; HTTPS only |
+| R-04 | Downtime during peak usage periods | Low | Medium | Vercel CDN + Supabase auto-scaling; health monitoring |
+| R-05 | Race conditions in payment confirmation (double-spend) | Low | High | Database-level constraints; transaction isolation |
+| R-06 | Mermaid diagrams not rendering on some viewers (e.g., offline PDFs) | Medium | Low | Fallback text descriptions provided alongside diagrams |
+| R-07 | Team member unavailability affecting deadlines | Medium | Medium | Clear branch ownership; documentation for handoffs |
+| R-08 | Breaking changes in Supabase JS client API | Low | Medium | Pin dependency versions; test upgrades in feature branch |
+
 ---
 
 ## 2. References
