@@ -170,7 +170,21 @@ Throughout this document, the following terms are used with specific meanings:
 | **Announcement** | A building-wide message posted by the manager |
 | **Maintenance Request** | A report of a physical issue in a unit or common area submitted by a resident |
 
-### 1.5 Scope Boundaries
+### 1.5 Stakeholders and Their Concerns
+
+The HomeLink system involves multiple stakeholders, each with distinct concerns that shape the architecture. Understanding these concerns is critical for making informed architectural decisions.
+
+| Stakeholder | Role | Primary Concerns | Addressed In |
+|------------|------|-----------------|--------------|
+| **Building Managers** | Primary end-users (administrative) | Ease of use, accurate financial tracking, time savings, data reliability | Section 9 (UC-02, UC-03, UC-05), Section 11 (Usability, Reliability) |
+| **Residents** | Primary end-users (consumers) | Transparency, mobile accessibility, quick response to requests, privacy | Section 9 (UC-04, UC-07), Section 11 (Security, Portability) |
+| **Development Team** | Designers and implementers | Maintainability, clear structure, low complexity, reusable components | Section 5 (Logical View), Section 7 (Development View) |
+| **Course Instructors** | Evaluators | Correctness of architectural documentation, adherence to 4+1 model, completeness | Entire document (structured per Kruchten's 4+1 View Model) |
+| **System Administrators** | Operations (future) | Deployment ease, monitoring, scalability, cost | Section 8 (Physical View), Section 10 (Size/Performance) |
+| **Future Maintainers** | Long-term contributors | Code clarity, documented decisions, minimal technical debt | Section 3.7 (ADRs), Section 7 (Development View), Appendices |
+| **Security Auditors** | Security reviewers | Authentication, authorization, data protection, vulnerability surface | Section 3.6 (Auth Flow), Section 11 (Security) |
+
+### 1.6 Scope Boundaries
 
 The following table clarifies what is included and excluded from the scope of HomeLink v1:
 
