@@ -727,6 +727,46 @@ src/
  ├── App.jsx
  └── main.jsx
 ```
+### 7.3 Component Diagram
 
+```mermaid
+graph TD
+
+subgraph Frontend
+    AuthModule[Auth Module]
+    ManagerDashboard[Manager Dashboard]
+    ResidentDashboard[Resident Dashboard]
+    DuesManagement[Dues Management]
+    PaymentModule[Payment Module]
+    MaintenanceModule[Maintenance Module]
+    AnnouncementsModule[Announcements Module]
+end
+
+subgraph Backend
+    SupabaseAuth[Supabase Auth]
+    PostgRESTAPI[PostgREST API]
+    PostgreSQL[PostgreSQL Database]
+    RealtimeEngine[Realtime Engine]
+end
+
+subgraph Infrastructure
+    VercelCDN[Vercel CDN]
+    GitHubRepo[GitHub Repository]
+end
+
+AuthModule --> SupabaseAuth
+ManagerDashboard --> PostgRESTAPI
+ResidentDashboard --> PostgRESTAPI
+DuesManagement --> PostgRESTAPI
+PaymentModule --> PostgRESTAPI
+MaintenanceModule --> PostgRESTAPI
+AnnouncementsModule --> PostgRESTAPI
+
+ManagerDashboard --> RealtimeEngine
+ResidentDashboard --> RealtimeEngine
+
+PostgRESTAPI --> PostgreSQL
+GitHubRepo --> VercelCDN
+```
 
 
