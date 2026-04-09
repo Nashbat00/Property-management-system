@@ -768,5 +768,12 @@ ResidentDashboard --> RealtimeEngine
 PostgRESTAPI --> PostgreSQL
 GitHubRepo --> VercelCDN
 ```
+### 7.4 Build and Deployment Pipeline
 
+1. The developer creates a feature branch from the main branch.
+2. The developer commits changes and pushes them to GitHub.
+3. A Pull Request is opened for review.
+4. After approval, the branch is merged into the main branch.
+5. Vercel detects the update through the GitHub webhook and starts automatic deployment.
+6. The production website is updated at the public URL within seconds.
 
