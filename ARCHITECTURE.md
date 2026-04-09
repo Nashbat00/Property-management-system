@@ -687,7 +687,46 @@ The following matrix shows how each use case relates to the architectural views 
 | Language         | JavaScript (ES6+)      | Core programming language            |
 
 
+### 7.2 Package Structure
 
+```
+src/
+ ├── components/
+ │   ├── auth/
+ │   │   ├── LoginForm.jsx
+ │   │   ├── SignUpForm.jsx
+ │   │   └── ProtectedRoute.jsx
+ │   ├── dashboard/
+ │   │   ├── ManagerDashboard.jsx
+ │   │   ├── ResidentDashboard.jsx
+ │   │   └── BalanceCard.jsx
+ │   ├── dues/
+ │   │   ├── AddDues.jsx
+ │   │   └── DuesList.jsx
+ │   ├── payments/
+ │   │   ├── PaymentHistory.jsx
+ │   │   └── PaymentConfirm.jsx
+ │   ├── maintenance/
+ │   │   ├── MaintenanceForm.jsx
+ │   │   └── MaintenanceList.jsx
+ │   └── announcements/
+ │       ├── AnnouncementForm.jsx
+ │       └── AnnouncementList.jsx
+ ├── lib/
+ │   └── supabaseClient.js
+ ├── hooks/
+ │   ├── useAuth.js
+ │   └── useRealtime.js
+ ├── pages/
+ │   ├── Login.jsx
+ │   ├── Signup.jsx
+ │   ├── Dashboard.jsx
+ │   └── NotFound.jsx
+ ├── utils/
+ │   └── calculations.js
+ ├── App.jsx
+ └── main.jsx
+```
 
 
 
