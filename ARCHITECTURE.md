@@ -500,6 +500,35 @@ The architecture is designed to satisfy the following quality attributes (detail
 
 ---
 
+## 4. Architectural Goals and Constraints
+
+### 4.1 Architectural Goals
+
+The following architectural goals define the key qualities that the HomeLink system must exhibit. These goals were identified through stakeholder analysis and project requirements.
+
+| Goal | Description |
+|------|-------------|
+| Usability | Simple, intuitive interface with minimal learning curve |
+| Real-time Updates | Instant updates via WebSocket for all connected clients |
+| Role-based Access | Strict separation between Manager and Resident at UI and data level |
+| Maintainability | Clean, modular React component structure for easy extension |
+| Availability | 24/7 access via any modern web browser on any device |
+
+### 4.2 Constraints
+
+The following constraints limit the architectural choices and must be respected throughout the design and implementation.
+
+| Constraint | Detail |
+|-----------|--------|
+| Technology Stack | React + Tailwind CSS + Supabase + Vercel (free tier only) |
+| Team Size | 5 developers with limited prior experience in the stack |
+| Timeline | 6-week development cycle |
+| Budget | Zero - only free-tier cloud services |
+| Browser Support | Modern browsers only: Chrome, Firefox, Safari, Edge |
+| Authentication | Supabase Auth with email/password only (no OAuth in v1) |
+
+---
+
 ## 6. Process Architecture
 
 ### 6.1. Key Processes
@@ -1012,5 +1041,107 @@ The following matrix shows how each use case relates to the architectural views 
 | UC-07 | Resident, Unit, Dues | View balance flow | `dashboard/ResidentDashboard` | PostgREST GET |
 | UC-08 | Resident, Announcement | View announcements flow | `announcements/` | PostgREST GET + Realtime SUB |
 | UC-09 | Resident, Payment | View payments flow | `payments/` | PostgREST GET (filtered) |
+
+---
+
+## 10. Size and Performance
+
+### 10.1 System Size Estimates
+
+| Metric | Estimate |
+|--------|----------|
+| Total Source Files | ~30-40 JSX/JS files |
+| Lines of Code | ~3,000-5,000 |
+| Database Tables | 6 tables |
+| Expected Users (v1) | 1 building, ~20-50 residents, 1-3 managers |
+
+### 10.2 Performance Targets
+
+| Metric | Target |
+|--------|--------|
+| Page Load Time | < 2 seconds (initial load) |
+| API Response Time | < 500ms per request |
+| Real-time Latency | < 1 second |
+| Concurrent Users | Up to 50 |
+| Max Database Size | < 100MB (within free tier) |
+
+### 10.3 Scalability
+
+The current architecture supports a single building with a limited number of residents and managers. For future multi-building support, a `building_id` foreign key would need to be added to all relevant tables, along with a building selection screen at login. The Supabase free tier provides 500MB of database storage and supports up to 50,000 monthly active users, which is more than sufficient for the v1 scope. If the system needs to scale beyond a single building, upgrading to a paid Supabase plan and implementing database partitioning by building would be the recommended approach.
+
+---
+
+## 11. Quality
+
+### 11.1 Quality Attributes
+
+| Attribute | How It Is Achieved |
+|-----------|-------------------|
+| Reliability | Try-catch blocks, user-friendly error messages, managed infrastructure |
+| Security | JWT tokens, Row Level Security (RLS), HTTPS, password hashing |
+| Usability | Responsive Tailwind design, clear navigation, minimal clicks |
+| Maintainability | Modular components, consistent naming, custom hooks |
+| Portability | Responsive web design, no native dependencies, standard HTML/CSS/JS |
+
+### 11.2 Security Measures
+
+The following security measures are implemented to protect user data and ensure system integrity:
+
+- **Authentication:** Supabase Auth with JWT tokens, automatic session refresh
+- **Authorization:** Row Level Security (RLS) policies on every database table
+- **Password Security:** Passwords hashed and salted by Supabase Auth, never stored in plaintext
+- **Transport Security:** All connections use HTTPS or WSS (WebSocket Secure)
+
+### 11.3 Testing Strategy
+
+| Test Type | Approach |
+|-----------|----------|
+| Functional | Manual testing of all user flows before each milestone |
+| Cross-browser | Verified on Chrome, Firefox, Safari, and Edge |
+| Responsive | Tested on desktop (1920x1080), tablet (768x1024), mobile (375x812) |
+| Security | Verify RLS policies by attempting cross-role data access |
+
+---
+
+## 12. Appendices
+
+### 12.1 Acronyms and Abbreviations
+
+| Acronym | Full Form |
+|---------|-----------|
+| SPA | Single Page Application |
+| REST | Representational State Transfer |
+| API | Application Programming Interface |
+| CDN | Content Delivery Network |
+| JWT | JSON Web Token |
+| RLS | Row Level Security |
+| CI/CD | Continuous Integration / Continuous Deployment |
+| WSS | WebSocket Secure |
+| CRUD | Create, Read, Update, Delete |
+| BaaS | Backend as a Service |
+| UI | User Interface |
+| UX | User Experience |
+
+### 12.2 Definitions
+
+| Term | Definition |
+|------|-----------|
+| Supabase | An open-source Backend-as-a-Service platform that provides a PostgreSQL database, authentication, real-time subscriptions, and auto-generated REST APIs. |
+| Vercel | A cloud platform for frontend deployment that provides static hosting, serverless functions, and a global CDN with automatic CI/CD from GitHub. |
+| React | A JavaScript library for building user interfaces using a component-based architecture, maintained by Meta. |
+| Tailwind CSS | A utility-first CSS framework that provides low-level utility classes for building custom designs without writing custom CSS. |
+| Row Level Security | A PostgreSQL feature that restricts which rows a user can access in a table based on policies defined using SQL expressions. |
+| PostgREST | A standalone web server that automatically generates a RESTful API from a PostgreSQL database schema, used internally by Supabase. |
+| WebSocket | A communication protocol that provides full-duplex communication channels over a single TCP connection, enabling real-time data transfer between client and server. |
+
+### 12.3 Design Principles
+
+| Principle | Explanation |
+|-----------|------------|
+| Separation of Concerns | Each React component handles a single responsibility. UI logic, data fetching, and state management are separated into distinct layers (components, hooks, lib). |
+| DRY (Don't Repeat Yourself) | Shared logic is extracted into custom hooks (`useAuth`, `useRealtime`) and utility functions (`calculations.js`) to avoid code duplication. |
+| Mobile-First Design | The UI is designed for mobile screens first using Tailwind's responsive utilities, then enhanced for larger screens using breakpoint prefixes (`md:`, `lg:`). |
+| Fail Gracefully | All API calls are wrapped in try-catch blocks with user-friendly error messages. The system degrades gracefully when real-time connections are unavailable. |
+| Least Privilege | Each user role has the minimum permissions necessary. RLS policies ensure residents can only access their own data, and managers cannot access other buildings. |
 
 ---
