@@ -54,6 +54,9 @@ This document is intended for developers, stakeholders, course instructors, and 
 | 0.4 | 2026-04-06 | Bager Diren Karakoyun | Added Use Case Diagram with 2 actors and 9 use cases |
 | 0.5 | 2026-04-06 | Bager Diren Karakoyun | Added 5 detailed use case descriptions (UC-01 through UC-05) |
 | 0.6 | 2026-04-06 | Bager Diren Karakoyun | Improved Section 3 with architecture diagram, technology mapping, and routing |
+| 0.7 | 2026-04-08 | Abdalrahman Mazen Ahmad Nashbat | Added Section 5.2 class diagram with 8 entities and 8 relationships |
+| 0.8 | 2026-04-08 | Abdalrahman Mazen Ahmad Nashbat | Added Section 5.1 logical architecture overview with entity descriptions |
+| 0.9 | 2026-04-08 | Abdalrahman Mazen Ahmad Nashbat | Added Section 5.3 key relationships with inheritance, association, composition semantics |
 
 ---
 
@@ -593,6 +596,149 @@ When a manager updates dues or confirms a payment, all connected clients receive
 The frontend subscribes to relevant table changes on component mount.
 This ensures that no manual page refresh is needed, as the UI updates automatically.
 This architecture guarantees data consistency across all active sessions.
+
+## 5. Logical View
+
+The Logical View describes the system's object-oriented decomposition into classes and entities. It focuses on the key abstractions of the HomeLink domain and their structural relationships, answering the question: *"What are the key abstractions in the system?"*
+
+### 5.1 Overview
+
+The HomeLink domain model consists of 8 core entities that together capture all the state and behavior required to operate a residential building management system. The table below summarizes each entity, its attributes, and the methods it exposes:
+
+| Entity | Attributes | Methods |
+|--------|-----------|---------|
+| **User** | id, email, password, fullName, role | login(), logout() |
+| **Manager** | (inherits from User) | createDues(), confirmPayment(), postAnnouncement(), viewAllUnits() |
+| **Resident** | (inherits from User) | viewBalance(), viewDues(), submitMaintenanceRequest(), viewAnnouncements() |
+| **Unit** | id, unitNumber, floor, currentBalance | - |
+| **Payment** | id, paymentDate, amount, status, month | - |
+| **Dues** | id, amount, month, createdAt | - |
+| **Announcement** | id, title, content, createdAt | - |
+| **MaintenanceRequest** | id, description, status, createdAt, resolvedAt | - |
+
+**Entity Descriptions:**
+
+- **User** is the base abstraction for anyone who can authenticate into HomeLink. It stores identity (`id`, `email`, `fullName`), credentials (`password`), and a `role` discriminator that determines whether the user is a Manager or Resident. It exposes the authentication behaviors `login()` and `logout()` which are inherited by both subclasses.
+
+- **Manager** is a specialization of User representing the building administrator. It adds administrative behaviors: `createDues()` to assign monthly charges to all units, `confirmPayment()` to approve resident payments, `postAnnouncement()` to broadcast messages to residents, and `viewAllUnits()` to access the global view of the building.
+
+- **Resident** is a specialization of User representing a tenant living in a unit. It exposes tenant-facing behaviors: `viewBalance()` and `viewDues()` to check financial obligations, `submitMaintenanceRequest()` to report issues in the building, and `viewAnnouncements()` to read manager broadcasts.
+
+- **Unit** represents a single apartment in the building. It is the central entity of the financial model: each unit has a `unitNumber`, a `floor`, and a `currentBalance` that is continuously recalculated as dues are created and payments are confirmed.
+
+- **Payment** records a single financial transaction made by a resident toward a unit's balance. It captures the `paymentDate`, the `amount` paid, the `month` the payment is for, and a `status` that transitions through the values `pending` → `confirmed` / `rejected` depending on manager verification.
+
+- **Dues** represents a monthly charge assigned to a unit. It stores the `amount` owed, the target `month`, and the `createdAt` timestamp when the manager generated the charge.
+
+- **Announcement** represents a message broadcast by the manager to all residents. It has a `title`, free-form `content`, and a `createdAt` timestamp used for chronological sorting on the dashboard.
+
+- **MaintenanceRequest** represents an issue reported by a resident about their unit or a shared area. It tracks a free-text `description`, a lifecycle `status` (`pending` → `in_progress` → `resolved`), a `createdAt` timestamp, and a `resolvedAt` timestamp that is set only when the manager marks the request as resolved.
+
+### 5.2 Class Diagram
+
+*Figure 5.1 - HomeLink Class Diagram*
+
+```mermaid
+classDiagram
+    class User {
+        +String id
+        +String email
+        +String password
+        +String fullName
+        +String role
+        +login()
+        +logout()
+    }
+
+    class Manager {
+        +createDues()
+        +confirmPayment()
+        +postAnnouncement()
+        +viewAllUnits()
+    }
+
+    class Resident {
+        +viewBalance()
+        +viewDues()
+        +submitMaintenanceRequest()
+        +viewAnnouncements()
+    }
+
+    class Unit {
+        +String id
+        +String unitNumber
+        +int floor
+        +double currentBalance
+    }
+
+    class Payment {
+        +String id
+        +Date paymentDate
+        +double amount
+        +String status
+        +String month
+    }
+
+    class Dues {
+        +String id
+        +double amount
+        +String month
+        +Date createdAt
+    }
+
+    class Announcement {
+        +String id
+        +String title
+        +String content
+        +Date createdAt
+    }
+
+    class MaintenanceRequest {
+        +String id
+        +String description
+        +String status
+        +Date createdAt
+        +Date resolvedAt
+    }
+
+    User <|-- Manager
+    User <|-- Resident
+    Manager "1" --> "*" Unit : manages
+    Resident "1" --> "1" Unit : lives in
+    Unit "1" --> "*" Payment : has
+    Unit "1" --> "*" Dues : owes
+    Unit "1" --> "*" MaintenanceRequest : reports
+    Manager "1" --> "*" Announcement : posts
+```
+
+The diagram above shows the 8 core domain entities of HomeLink, their attributes, methods, and the relationships that connect them. The model is centered around the `Unit` entity, which aggregates financial and maintenance data, while `User` is specialized into two subclasses (`Manager` and `Resident`) through inheritance.
+
+### 5.3 Key Relationships
+
+The table below summarizes the 8 relationships in the HomeLink class diagram, their UML type, and their meaning in the domain:
+
+| Relationship | Type | Description |
+|--------------|------|-------------|
+| `User <\|-- Manager` | Inheritance | `Manager` is a specialization of `User` and inherits the authentication attributes and methods (`login()`, `logout()`). |
+| `User <\|-- Resident` | Inheritance | `Resident` is a specialization of `User` and inherits the same authentication contract as `Manager`. |
+| `Manager "1" --> "*" Unit` | Association | A single `Manager` manages all units in the building. This is a one-to-many read relationship used by `viewAllUnits()`. |
+| `Resident "1" --> "1" Unit` | Association | Each `Resident` lives in exactly one `Unit`, and each `Unit` is occupied by one `Resident`. This link is used to filter dues and payments for the logged-in resident. |
+| `Unit "1" --> "*" Payment` | Composition | Every `Unit` owns a collection of `Payment` records. Payments cannot exist without a parent unit, so their lifecycle is bound to the unit (composition semantics). |
+| `Unit "1" --> "*" Dues` | Association | Each `Unit` is assigned a sequence of monthly `Dues` by the manager. Dues refer to a unit but are created independently in monthly batches, so the relationship is modeled as an association rather than composition. |
+| `Unit "1" --> "*" MaintenanceRequest` | Composition | Every `Unit` can raise multiple `MaintenanceRequest` records over time. A request is meaningful only in the context of its unit, so the lifecycle is composed. |
+| `Manager "1" --> "*" Announcement` | Association | The `Manager` is the sole author of `Announcement` entities. Announcements are broadcast to all residents and exist independently of any specific unit. |
+
+**Relationship Semantics:**
+
+- **Inheritance (`User <\|-- Manager`, `User <\|-- Resident`)** models the role-based authentication system. Both subclasses share the same identity and credential structure but override the behavior layer with role-specific operations. This allows the Supabase `users` table to be implemented as a single table with a `role` discriminator column.
+
+- **Association** is used whenever two entities are connected conceptually but can exist independently. For example, a `Dues` record refers to a `Unit`, but dues are generated in monthly batches by the manager and are meaningful on their own as financial records. Similarly, `Announcement` entities are authored by a `Manager` but are not owned by any specific unit.
+
+- **Composition** is used when a child entity's lifecycle is strictly tied to its parent. A `Payment` cannot exist without the `Unit` it is paying for, and a `MaintenanceRequest` is always raised against a specific unit. If a unit were ever removed, its payments and maintenance requests would logically be removed with it.
+
+- **Multiplicities** capture the cardinality of each relationship: `"1" --> "*"` means one-to-many (e.g., one unit has many payments), while `"1" --> "1"` means one-to-one (each resident lives in exactly one unit). These multiplicities are enforced at the database level through foreign key constraints and Row Level Security policies.
+
+---
 
 ## 9. Scenarios
 
