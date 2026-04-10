@@ -1252,6 +1252,10 @@ GitHubRepo --> VercelCDN
 5. Vercel detects the update through the GitHub webhook and starts automatic deployment.
 6. The production website is updated at the public URL within seconds.
 
+---
+
+## 8. Physical View
+
 ### 8.1 Deployment Diagram
 
 ```mermaid
