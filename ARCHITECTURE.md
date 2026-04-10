@@ -829,3 +829,35 @@ The following matrix shows how each use case relates to the architectural views 
 The current architecture supports a single building with a limited number of residents and managers. For future multi-building support, a `building_id` foreign key would need to be added to all relevant tables, along with a building selection screen at login. The Supabase free tier provides 500MB of database storage and supports up to 50,000 monthly active users, which is more than sufficient for the v1 scope. If the system needs to scale beyond a single building, upgrading to a paid Supabase plan and implementing database partitioning by building would be the recommended approach.
 
 ---
+
+## 11. Quality
+
+### 11.1 Quality Attributes
+
+| Attribute | How It Is Achieved |
+|-----------|-------------------|
+| Reliability | Try-catch blocks, user-friendly error messages, managed infrastructure |
+| Security | JWT tokens, Row Level Security (RLS), HTTPS, password hashing |
+| Usability | Responsive Tailwind design, clear navigation, minimal clicks |
+| Maintainability | Modular components, consistent naming, custom hooks |
+| Portability | Responsive web design, no native dependencies, standard HTML/CSS/JS |
+
+### 11.2 Security Measures
+
+The following security measures are implemented to protect user data and ensure system integrity:
+
+- **Authentication:** Supabase Auth with JWT tokens, automatic session refresh
+- **Authorization:** Row Level Security (RLS) policies on every database table
+- **Password Security:** Passwords hashed and salted by Supabase Auth, never stored in plaintext
+- **Transport Security:** All connections use HTTPS or WSS (WebSocket Secure)
+
+### 11.3 Testing Strategy
+
+| Test Type | Approach |
+|-----------|----------|
+| Functional | Manual testing of all user flows before each milestone |
+| Cross-browser | Verified on Chrome, Firefox, Safari, and Edge |
+| Responsive | Tested on desktop (1920x1080), tablet (768x1024), mobile (375x812) |
+| Security | Verify RLS policies by attempting cross-role data access |
+
+---
