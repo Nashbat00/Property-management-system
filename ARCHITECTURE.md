@@ -861,3 +861,46 @@ The following security measures are implemented to protect user data and ensure 
 | Security | Verify RLS policies by attempting cross-role data access |
 
 ---
+
+## 12. Appendices
+
+### 12.1 Acronyms and Abbreviations
+
+| Acronym | Full Form |
+|---------|-----------|
+| SPA | Single Page Application |
+| REST | Representational State Transfer |
+| API | Application Programming Interface |
+| CDN | Content Delivery Network |
+| JWT | JSON Web Token |
+| RLS | Row Level Security |
+| CI/CD | Continuous Integration / Continuous Deployment |
+| WSS | WebSocket Secure |
+| CRUD | Create, Read, Update, Delete |
+| BaaS | Backend as a Service |
+| UI | User Interface |
+| UX | User Experience |
+
+### 12.2 Definitions
+
+| Term | Definition |
+|------|-----------|
+| Supabase | An open-source Backend-as-a-Service platform that provides a PostgreSQL database, authentication, real-time subscriptions, and auto-generated REST APIs. |
+| Vercel | A cloud platform for frontend deployment that provides static hosting, serverless functions, and a global CDN with automatic CI/CD from GitHub. |
+| React | A JavaScript library for building user interfaces using a component-based architecture, maintained by Meta. |
+| Tailwind CSS | A utility-first CSS framework that provides low-level utility classes for building custom designs without writing custom CSS. |
+| Row Level Security | A PostgreSQL feature that restricts which rows a user can access in a table based on policies defined using SQL expressions. |
+| PostgREST | A standalone web server that automatically generates a RESTful API from a PostgreSQL database schema, used internally by Supabase. |
+| WebSocket | A communication protocol that provides full-duplex communication channels over a single TCP connection, enabling real-time data transfer between client and server. |
+
+### 12.3 Design Principles
+
+| Principle | Explanation |
+|-----------|------------|
+| Separation of Concerns | Each React component handles a single responsibility. UI logic, data fetching, and state management are separated into distinct layers (components, hooks, lib). |
+| DRY (Don't Repeat Yourself) | Shared logic is extracted into custom hooks (`useAuth`, `useRealtime`) and utility functions (`calculations.js`) to avoid code duplication. |
+| Mobile-First Design | The UI is designed for mobile screens first using Tailwind's responsive utilities, then enhanced for larger screens using breakpoint prefixes (`md:`, `lg:`). |
+| Fail Gracefully | All API calls are wrapped in try-catch blocks with user-friendly error messages. The system degrades gracefully when real-time connections are unavailable. |
+| Least Privilege | Each user role has the minimum permissions necessary. RLS policies ensure residents can only access their own data, and managers cannot access other buildings. |
+
+---
