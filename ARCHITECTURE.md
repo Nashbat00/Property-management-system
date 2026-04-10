@@ -497,7 +497,102 @@ The architecture is designed to satisfy the following quality attributes (detail
 
 ---
 
-<!-- Sections 4-8 will be added by other team members in their respective branches -->
+## 6. Process Architecture
+
+### 6.1. Key Processes
+The system focuses on several key processes to ensure secure and real-time management
+
+### 6.2. Sequence Diagram: User Login
+```mermaid
+sequenceDiagram
+actor U as User
+participant F as React Frontend
+participant A as Supabase Auth
+participant D as Supabase Database
+U->>F: Enter email and password
+F->>A: signInWithPassword(email, password)
+A-->>A: Validate credentials
+alt Valid credentials
+A-->>F: Return session token + user data
+F-->>D: Query user role
+D-->>F: Return role information
+F-->>U: Display Dashboard
+else Invalid credentials
+A-->>F: Return authentication error
+F-->>U: Display error message
+end
+```
+### 6.3. Sequence Diagram: Add Dues
+```mermaid
+sequenceDiagram
+    participant Manager
+    participant Frontend
+    participant DB as Supabase Database
+    participant Realtime as Supabase Realtime
+
+    Manager->>Frontend: Navigate to Add Dues
+    Frontend->>DB: Fetch all units
+    Manager->>Frontend: Select amount and month
+    Frontend->>DB: Save dues records
+    DB->>Realtime: Notify changes
+    Realtime-->>Frontend: Alert all residents
+```
+
+### 6.4. Sequence Diagram: Maintenance Request
+```mermaid
+sequenceDiagram
+    participant R as Resident
+    participant F as Frontend
+    participant DB as Supabase Database
+    participant M as Manager
+
+    R->>F: Fill and submit form
+    F->>DB: Save with "pending" status
+    DB-->>F: Confirm save
+    F-->>R: Request submitted successfully
+
+    Note over M, F: Review Process
+    M->>F: Open dashboard
+    F->>DB: Fetch "pending" requests
+    M->>F: Update status to "in_progress"
+    F->>DB: Update record
+    M->>F: Update status to "resolved"
+    F->>DB: Update record
+    DB-->>F: Notify Resident (via Realtime/Email)
+```
+### 6.5. Activity Diagram: Payment Flow
+```mermaid
+flowchart TD
+    Start([Start]) --> CreateDues[Manager creates monthly dues]
+    CreateDues --> Calculate[System calculates per-unit charges]
+    Calculate --> Assign[Dues assigned to all units]
+    Assign --> ViewBalance[Resident views outstanding balance]
+    
+    ViewBalance --> Decision1{Does the resident make a payment?}
+    
+    Decision1 -- No --> Unpaid[Balance remains unpaid]
+    Unpaid --> ViewBalance
+    
+    Decision1 -- Yes --> Notify[Resident notifies manager]
+    Notify --> Review[Manager reviews payment]
+    
+    Review --> Decision2{Is the payment verified?}
+    
+    Decision2 -- No --> Reject[Manager rejects, notifies resident]
+    Reject --> ViewBalance
+    
+    Decision2 -- Yes --> Settle[Mark as settled]
+    Settle --> UpdateBalance[Update balance]
+    UpdateBalance --> Record[Record in history]
+    Record --> End([End])
+```
+### 6.6. Concurrency and Real-time Behavior
+
+Supabase Realtime uses WebSocket connections for live data updates.
+When a manager updates dues or confirms a payment, all connected clients receive the update instantly.
+The frontend subscribes to relevant table changes on component mount.
+This ensures that no manual page refresh is needed, as the UI updates automatically.
+This architecture guarantees data consistency across all active sessions.
 
 ## 9. Scenarios
 
