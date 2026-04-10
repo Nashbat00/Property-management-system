@@ -1145,3 +1145,166 @@ The following security measures are implemented to protect user data and ensure 
 | Least Privilege | Each user role has the minimum permissions necessary. RLS policies ensure residents can only access their own data, and managers cannot access other buildings. |
 
 ---
+
+## 7. Development View
+
+### 7.1 Technology Stack
+
+| Layer            | Technology              | Purpose                              |
+|------------------|------------------------|--------------------------------------|
+| Frontend         | React 18               | Component-based UI development       |
+| Styling          | Tailwind CSS           | Utility-first CSS framework          |
+| Backend / DB     | Supabase (PostgreSQL)  | Data storage + auto REST API         |
+| Authentication   | Supabase Auth          | User registration, login, sessions   |
+| Real-time        | Supabase Realtime      | WebSocket-based live updates         |
+| Hosting          | Vercel                 | Static site hosting with CI/CD       |
+| Version Control  | GitHub                 | Source code + Git history            |
+| Language         | JavaScript (ES6+)      | Core programming language            |
+
+
+### 7.2 Package Structure
+
+```
+src/
+ ├── components/
+ │   ├── auth/
+ │   │   ├── LoginForm.jsx
+ │   │   ├── SignUpForm.jsx
+ │   │   └── ProtectedRoute.jsx
+ │   ├── dashboard/
+ │   │   ├── ManagerDashboard.jsx
+ │   │   ├── ResidentDashboard.jsx
+ │   │   └── BalanceCard.jsx
+ │   ├── dues/
+ │   │   ├── AddDues.jsx
+ │   │   └── DuesList.jsx
+ │   ├── payments/
+ │   │   ├── PaymentHistory.jsx
+ │   │   └── PaymentConfirm.jsx
+ │   ├── maintenance/
+ │   │   ├── MaintenanceForm.jsx
+ │   │   └── MaintenanceList.jsx
+ │   └── announcements/
+ │       ├── AnnouncementForm.jsx
+ │       └── AnnouncementList.jsx
+ ├── lib/
+ │   └── supabaseClient.js
+ ├── hooks/
+ │   ├── useAuth.js
+ │   └── useRealtime.js
+ ├── pages/
+ │   ├── Login.jsx
+ │   ├── Signup.jsx
+ │   ├── Dashboard.jsx
+ │   └── NotFound.jsx
+ ├── utils/
+ │   └── calculations.js
+ ├── App.jsx
+ └── main.jsx
+```
+### 7.3 Component Diagram
+
+```mermaid
+graph TD
+
+subgraph Frontend
+    AuthModule[Auth Module]
+    ManagerDashboard[Manager Dashboard]
+    ResidentDashboard[Resident Dashboard]
+    DuesManagement[Dues Management]
+    PaymentModule[Payment Module]
+    MaintenanceModule[Maintenance Module]
+    AnnouncementsModule[Announcements Module]
+end
+
+subgraph Backend
+    SupabaseAuth[Supabase Auth]
+    PostgRESTAPI[PostgREST API]
+    PostgreSQL[PostgreSQL Database]
+    RealtimeEngine[Realtime Engine]
+end
+
+subgraph Infrastructure
+    VercelCDN[Vercel CDN]
+    GitHubRepo[GitHub Repository]
+end
+
+AuthModule --> SupabaseAuth
+ManagerDashboard --> PostgRESTAPI
+ResidentDashboard --> PostgRESTAPI
+DuesManagement --> PostgRESTAPI
+PaymentModule --> PostgRESTAPI
+MaintenanceModule --> PostgRESTAPI
+AnnouncementsModule --> PostgRESTAPI
+
+ManagerDashboard --> RealtimeEngine
+ResidentDashboard --> RealtimeEngine
+
+PostgRESTAPI --> PostgreSQL
+GitHubRepo --> VercelCDN
+```
+### 7.4 Build and Deployment Pipeline
+
+1. The developer creates a feature branch from the main branch.
+2. The developer commits changes and pushes them to GitHub.
+3. A Pull Request is opened for review.
+4. After approval, the branch is merged into the main branch.
+5. Vercel detects the update through the GitHub webhook and starts automatic deployment.
+6. The production website is updated at the public URL within seconds.
+
+### 8.1 Deployment Diagram
+
+```mermaid
+graph TD
+
+subgraph ClientDevices
+    Desktop[Desktop Browser]
+    Mobile[Mobile Browser]
+end
+
+subgraph VercelCloud
+    CDN[Vercel CDN]
+    StaticHosting[Static File Hosting]
+    ReactBundle[React SPA Bundle]
+end
+
+subgraph SupabaseCloud
+    AuthService[Auth Service]
+    Database[PostgreSQL Database]
+    Realtime[Realtime Server]
+    API[PostgREST API]
+end
+
+subgraph Development
+    GitHub[GitHub Repository]
+end
+
+Desktop --> CDN
+Mobile --> CDN
+
+CDN --> StaticHosting
+StaticHosting --> ReactBundle
+
+ReactBundle --> API
+ReactBundle --> AuthService
+ReactBundle --> Realtime
+
+API --> Database
+
+GitHub --> CDN
+```
+### 8.2 Deployment Topology
+
+The system uses a fully cloud-based and serverless deployment architecture. The client tier consists of users accessing the application through desktop and mobile browsers. The frontend is delivered using Vercel’s CDN, which ensures fast and reliable distribution of static assets. The backend tier is provided by Supabase running on AWS infrastructure, offering authentication, database, API, and real-time services. CI/CD is managed through GitHub, where code updates trigger automatic deployments to Vercel.
+
+### 8.3 Network Communication
+
+| Connection                   | Protocol         | Purpose                           |
+|-----------------------------|------------------|-----------------------------------|
+| Browser <-> Vercel         | HTTPS            | Serve static frontend assets      |
+| Browser <-> Supabase API   | HTTPS (REST)     | CRUD operations on DB tables      |
+| Browser <-> Supabase Realtime | WSS (WebSocket) | Live data updates to clients      |
+| Browser <-> Supabase Auth  | HTTPS            | User registration and login       |
+| GitHub <-> Vercel          | Webhook (HTTPS)  | Trigger automated deployments     |
+
+---
