@@ -802,3 +802,30 @@ The following matrix shows how each use case relates to the architectural views 
 | UC-09 | Resident, Payment | View payments flow | `payments/` | PostgREST GET (filtered) |
 
 ---
+
+## 10. Size and Performance
+
+### 10.1 System Size Estimates
+
+| Metric | Estimate |
+|--------|----------|
+| Total Source Files | ~30-40 JSX/JS files |
+| Lines of Code | ~3,000-5,000 |
+| Database Tables | 6 tables |
+| Expected Users (v1) | 1 building, ~20-50 residents, 1-3 managers |
+
+### 10.2 Performance Targets
+
+| Metric | Target |
+|--------|--------|
+| Page Load Time | < 2 seconds (initial load) |
+| API Response Time | < 500ms per request |
+| Real-time Latency | < 1 second |
+| Concurrent Users | Up to 50 |
+| Max Database Size | < 100MB (within free tier) |
+
+### 10.3 Scalability
+
+The current architecture supports a single building with a limited number of residents and managers. For future multi-building support, a `building_id` foreign key would need to be added to all relevant tables, along with a building selection screen at login. The Supabase free tier provides 500MB of database storage and supports up to 50,000 monthly active users, which is more than sufficient for the v1 scope. If the system needs to scale beyond a single building, upgrading to a paid Supabase plan and implementing database partitioning by building would be the recommended approach.
+
+---
