@@ -308,6 +308,23 @@ The system focuses on several key processes to ensure secure and real-time manag
 
 ### 6.2. Sequence Diagram: User Login
 ```mermaid
+sequenceDiagram
+actor U as User
+participant F as React Frontend
+participant A as Supabase Auth
+participant D as Supabase Database
+U->>F: Enter email and password
+F->>A: signInWithPassword(email, password)
+A-->>A: Validate credentials
+alt Valid credentials
+A-->>F: Return session token + user data
+F-->>D: Query user role
+D-->>F: Return role information
+F-->>U: Display Dashboard
+else Invalid credentials
+A-->>F: Return authentication error
+F-->>U: Display error message
+end
 ```
 ### 6.3. Sequence Diagram: Add Dues
 ```mermaid
