@@ -497,7 +497,36 @@ The architecture is designed to satisfy the following quality attributes (detail
 
 ---
 
-<!-- Sections 4-8 will be added by other team members in their respective branches -->
+## 4. Architectural Goals and Constraints
+
+### 4.1 Architectural Goals
+
+The following architectural goals define the key qualities that the HomeLink system must exhibit. These goals were identified through stakeholder analysis and project requirements.
+
+| Goal | Description |
+|------|-------------|
+| Usability | Simple, intuitive interface with minimal learning curve |
+| Real-time Updates | Instant updates via WebSocket for all connected clients |
+| Role-based Access | Strict separation between Manager and Resident at UI and data level |
+| Maintainability | Clean, modular React component structure for easy extension |
+| Availability | 24/7 access via any modern web browser on any device |
+
+### 4.2 Constraints
+
+The following constraints limit the architectural choices and must be respected throughout the design and implementation.
+
+| Constraint | Detail |
+|-----------|--------|
+| Technology Stack | React + Tailwind CSS + Supabase + Vercel (free tier only) |
+| Team Size | 5 developers with limited prior experience in the stack |
+| Timeline | 6-week development cycle |
+| Budget | Zero - only free-tier cloud services |
+| Browser Support | Modern browsers only: Chrome, Firefox, Safari, Edge |
+| Authentication | Supabase Auth with email/password only (no OAuth in v1) |
+
+---
+
+<!-- Sections 5-8 will be added by other team members in their respective branches -->
 
 ## 9. Scenarios
 
