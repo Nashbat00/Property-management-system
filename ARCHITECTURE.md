@@ -2,25 +2,6 @@
 
 ---
 
-## Executive Summary
-
-HomeLink is a web-based property management platform designed to digitize and streamline the administrative operations of residential buildings. This document presents the complete software architecture of HomeLink, following the **4+1 View Model** proposed by Philippe Kruchten (1995).
-
-The system adopts a **client-server architecture** with a **React 18 Single Page Application (SPA)** as the frontend and **Supabase** as the Backend-as-a-Service (BaaS), providing PostgreSQL database, JWT-based authentication, auto-generated REST API, and real-time WebSocket subscriptions. This architectural choice enables rapid development, minimal backend code, built-in security through Row Level Security (RLS), and zero-cost deployment on free-tier cloud services (Vercel + Supabase).
-
-Key architectural highlights:
-
-- **Two-tier client-server** architecture with clear separation of concerns
-- **Real-time data synchronization** via Supabase Realtime WebSocket subscriptions
-- **Role-based access control** enforced at both UI and database levels
-- **Stateless authentication** using JWT tokens with automatic session refresh
-- **Responsive, mobile-first** user interface using Tailwind CSS utility classes
-- **Zero-cost deployment** leveraging Vercel (frontend) and Supabase (backend) free tiers
-
-This document is intended for developers, stakeholders, course instructors, and future maintainers who need to understand the architectural decisions, trade-offs, and implementation structure of the HomeLink system.
-
----
-
 ## Title Page
 
 | | |
@@ -37,9 +18,9 @@ This document is intended for developers, stakeholders, course instructors, and 
 | Name | Student ID | Responsibility |
 |------|-----------|----------------|
 | Bager Diren Karakoyun | 210513250 | Project Lead, README, Sections 1-3, Section 9 (Scenarios) |
-| Abdalrahman Mazen Ahmad Nashbat | 230513079 | Section 5 - Logical View (Class Diagram) |
-| Deo Gratias Kipioka Mutipula | 220513571 | Section 6 - Process View (Sequence + Activity Diagrams) |
-| Maryama Said Mohamoud | 210513248 | Sections 7-8 - Development + Physical Views |
+| Abdalrahman Mazen Ahmad Nashbat | 230513079 | Section 5 - Logical Architecture (Class Diagram) |
+| Deo Gratias Kipioka Mutipula | 220513571 | Section 6 - Process Architecture (Sequence + Activity Diagrams) |
+| Maryama Said Mohamoud | 210513248 | Sections 7-8 - Development + Physical Architecture |
 | Alawi Khaled Alhamed | 230513621 | Section 4 (Goals), Sections 10-11 (Size/Performance, Quality), Appendices |
 
 ---
@@ -65,15 +46,15 @@ This document is intended for developers, stakeholders, course instructors, and 
 1. [Scope](#1-scope)
 2. [References](#2-references)
 3. [Software Architecture](#3-software-architecture)
-4. [Architectural Goals and Constraints](#4-architectural-goals-and-constraints)
-5. [Logical View](#5-logical-view)
-6. [Process View](#6-process-view)
-7. [Development View](#7-development-view)
-8. [Physical View](#8-physical-view)
+4. [Architectural Goals & Constraints](#4-architectural-goals--constraints)
+5. [Logical Architecture](#5-logical-architecture)
+6. [Process Architecture](#6-process-architecture)
+7. [Development Architecture](#7-development-architecture)
+8. [Physical Architecture](#8-physical-architecture)
 9. [Scenarios](#9-scenarios)
 10. [Size and Performance](#10-size-and-performance)
 11. [Quality](#11-quality)
-12. [Appendices](#12-appendices)
+- [Appendices](#appendices)
 
 ---
 
@@ -81,8 +62,7 @@ This document is intended for developers, stakeholders, course instructors, and 
 
 | Figure # | Title | Section |
 |----------|-------|---------|
-| Figure 3.1 | System Context Diagram | Section 3.1 |
-| Figure 3.2 | High-Level System Architecture Diagram | Section 3.4 |
+| Figure 3.1 | High-Level System Architecture Diagram | Section 3.3 |
 | Figure 5.1 | Class Diagram | Section 5.2 |
 | Figure 6.1 | Sequence Diagram - User Login | Section 6.2 |
 | Figure 6.2 | Sequence Diagram - Add Dues | Section 6.3 |
@@ -115,10 +95,10 @@ This Software Architecture Document (SAD) describes the architecture of the Home
 
 | View | Purpose | Key Question |
 |------|---------|-------------|
-| **Logical View** | Object-oriented decomposition into classes and entities | *What are the key abstractions?* |
-| **Process View** | Runtime behavior, concurrency, and synchronization | *How does the system behave at runtime?* |
-| **Development View** | Module structure, packages, and technology layers | *How is the code organized?* |
-| **Physical View** | Deployment topology and infrastructure mapping | *Where does the software run?* |
+| **Logical Architecture** | Object-oriented decomposition into classes and entities | *What are the key abstractions?* |
+| **Process Architecture** | Runtime behavior, concurrency, and synchronization | *How does the system behave at runtime?* |
+| **Development Architecture** | Module structure, packages, and technology layers | *How is the code organized?* |
+| **Physical Architecture** | Deployment topology and infrastructure mapping | *Where does the software run?* |
 | **Scenarios (+1)** | Use cases that validate and connect all views | *What does the user actually do?* |
 
 ### 1.3 Target Audience
@@ -131,64 +111,7 @@ This document is intended for:
 - **Maintainers** who will extend, modify, or debug the system in the future
 - **New Team Members** who need to onboard quickly and understand the system's design rationale
 
-### 1.4 Document Conventions
-
-The following conventions are used throughout this document to ensure clarity and consistency:
-
-**Typography:**
-
-| Notation | Meaning | Example |
-|----------|---------|---------|
-| `code` | Technical identifiers (class names, table names, methods, endpoints) | `signInWithPassword()`, `users` table |
-| **Bold** | Key terms, component names, or emphasis | **React SPA**, **Supabase Auth** |
-| *Italic* | Figure captions, references to external documents, subtle emphasis | *Figure 3.1*, *Kruchten (1995)* |
-| `UPPERCASE` | HTTP methods, SQL keywords | `GET`, `POST`, `SELECT` |
-
-**Diagrams:**
-
-All diagrams in this document are written in **Mermaid** syntax, which renders natively on GitHub. Mermaid was chosen over image files for the following reasons:
-
-- **Version control friendly** - Diagrams are plain text and can be diffed
-- **Easy to maintain** - No need for external tools (draw.io, Lucidchart, etc.)
-- **GitHub native rendering** - Diagrams display automatically in `.md` files
-- **Collaborative editing** - Team members can edit diagrams without design software
-
-**Identifiers:**
-
-- **Use Case IDs:** `UC-XX` (e.g., `UC-01`, `UC-02`)
-- **Business Rule IDs:** `BR-XX` (e.g., `BR-01`, `BR-02`)
-- **Architecture Decision Record IDs:** `ADR-XXX` (e.g., `ADR-001`, `ADR-002`)
-- **Figure IDs:** `Figure X.Y` where `X` is the section number and `Y` is the sequence within the section
-
-**Terminology:**
-
-Throughout this document, the following terms are used with specific meanings:
-
-| Term | Definition |
-|------|-----------|
-| **Manager** | A user with the role "manager", representing a building administrator with full system access |
-| **Resident** | A user with the role "resident", representing a building tenant with limited, unit-scoped access |
-| **Unit** | An individual apartment or housing unit within the building |
-| **Dues** | Monthly maintenance fees charged to each unit |
-| **Payment** | A record of money paid by a resident toward their dues |
-| **Announcement** | A building-wide message posted by the manager |
-| **Maintenance Request** | A report of a physical issue in a unit or common area submitted by a resident |
-
-### 1.5 Stakeholders and Their Concerns
-
-The HomeLink system involves multiple stakeholders, each with distinct concerns that shape the architecture. Understanding these concerns is critical for making informed architectural decisions.
-
-| Stakeholder | Role | Primary Concerns | Addressed In |
-|------------|------|-----------------|--------------|
-| **Building Managers** | Primary end-users (administrative) | Ease of use, accurate financial tracking, time savings, data reliability | Section 9 (UC-02, UC-03, UC-05), Section 11 (Usability, Reliability) |
-| **Residents** | Primary end-users (consumers) | Transparency, mobile accessibility, quick response to requests, privacy | Section 9 (UC-04, UC-07), Section 11 (Security, Portability) |
-| **Development Team** | Designers and implementers | Maintainability, clear structure, low complexity, reusable components | Section 5 (Logical View), Section 7 (Development View) |
-| **Course Instructors** | Evaluators | Correctness of architectural documentation, adherence to 4+1 model, completeness | Entire document (structured per Kruchten's 4+1 View Model) |
-| **System Administrators** | Operations (future) | Deployment ease, monitoring, scalability, cost | Section 8 (Physical View), Section 10 (Size/Performance) |
-| **Future Maintainers** | Long-term contributors | Code clarity, documented decisions, minimal technical debt | Section 3.7 (ADRs), Section 7 (Development View), Appendices |
-| **Security Auditors** | Security reviewers | Authentication, authorization, data protection, vulnerability surface | Section 3.6 (Auth Flow), Section 11 (Security) |
-
-### 1.6 Scope Boundaries
+### 1.4 Scope Boundaries
 
 The following table clarifies what is included and excluded from the scope of HomeLink v1:
 
@@ -202,47 +125,6 @@ The following table clarifies what is included and excluded from the scope of Ho
 | Maintenance request submission and tracking | Work order assignment to external contractors |
 | Text-based announcements | Rich media announcements (images, videos, files) |
 | Desktop and mobile responsive web app | Native iOS/Android mobile applications |
-
-### 1.7 Assumptions and Dependencies
-
-The HomeLink architecture is based on the following assumptions and external dependencies. A change in any of these assumptions may require architectural revisions.
-
-**Assumptions:**
-
-| ID | Assumption | Impact if Invalid |
-|----|-----------|-------------------|
-| A-01 | All users have access to a modern web browser with JavaScript enabled | System becomes inaccessible; native app required |
-| A-02 | Users have reliable internet connectivity for real-time features | Real-time updates fail; offline mode needed |
-| A-03 | The target building has fewer than 100 residents | Free tier limits exceeded; paid plan required |
-| A-04 | Manager is a trusted actor who will not abuse administrative privileges | Additional audit logging and approval workflows required |
-| A-05 | Payments are verified manually against bank records by the manager | Payment gateway integration required (PCI compliance) |
-| A-06 | English is the primary language for the user interface | Internationalization (i18n) support required |
-
-**External Dependencies:**
-
-| Dependency | Provider | Risk Level | Mitigation |
-|-----------|---------|-----------|-----------|
-| **Supabase** (Auth, DB, Realtime) | Supabase Inc. | High (vendor lock-in) | Database schema is portable; could migrate to self-hosted PostgreSQL |
-| **Vercel** (Hosting, CI/CD) | Vercel Inc. | Medium | Static files can be hosted on any CDN (Netlify, Cloudflare Pages) |
-| **React 18** | Meta (Facebook) | Low | Stable, widely adopted, LTS support |
-| **Tailwind CSS** | Tailwind Labs | Low | Compiled to standard CSS; no runtime dependency |
-| **Vite** | Vue.js team | Low | Alternative bundlers (Webpack, Parcel) available |
-| **GitHub** | GitHub Inc. | Low | Can migrate to GitLab, Bitbucket if needed |
-
-### 1.8 Risks and Mitigation Strategies
-
-The following risks have been identified and mitigation strategies have been defined to address them:
-
-| Risk ID | Description | Likelihood | Impact | Mitigation Strategy |
-|---------|------------|-----------|--------|---------------------|
-| R-01 | Supabase free tier limits exceeded due to unexpected growth | Low | High | Monitor usage metrics; upgrade to paid tier if needed |
-| R-02 | Data loss due to accidental deletion or database corruption | Low | Critical | Supabase automatic daily backups; manual exports before major changes |
-| R-03 | Unauthorized access due to leaked JWT tokens | Medium | High | Short token expiration (1 hour); refresh token rotation; HTTPS only |
-| R-04 | Downtime during peak usage periods | Low | Medium | Vercel CDN + Supabase auto-scaling; health monitoring |
-| R-05 | Race conditions in payment confirmation (double-spend) | Low | High | Database-level constraints; transaction isolation |
-| R-06 | Mermaid diagrams not rendering on some viewers (e.g., offline PDFs) | Medium | Low | Fallback text descriptions provided alongside diagrams |
-| R-07 | Team member unavailability affecting deadlines | Medium | Medium | Clear branch ownership; documentation for handoffs |
-| R-08 | Breaking changes in Supabase JS client API | Low | Medium | Pin dependency versions; test upgrades in feature branch |
 
 ---
 
@@ -265,56 +147,7 @@ The following references were used in the preparation of this document and the d
 
 ## 3. Software Architecture
 
-### 3.1 System Context
-
-Before diving into internal architecture, it is important to understand HomeLink's context within its external environment. The system context diagram below illustrates the HomeLink system and its interactions with external actors and systems.
-
-*Figure 3.1 - HomeLink System Context Diagram*
-
-```mermaid
-graph TB
-    Manager([Building Manager])
-    Resident([Resident])
-    Browser[Web Browser]
-
-    subgraph HomeLinkSystem["HomeLink System Boundary"]
-        App["HomeLink Application<br/>(React SPA + Supabase BaaS)"]
-    end
-
-    GitHub[GitHub<br/>Source Control]
-    Vercel[Vercel<br/>Hosting Platform]
-    SupabaseCloud[Supabase Cloud<br/>BaaS Provider]
-
-    Manager -->|"Uses"| Browser
-    Resident -->|"Uses"| Browser
-    Browser <-->|"HTTPS / WSS"| App
-
-    App -.->|"Deployed to"| Vercel
-    App -.->|"Backed by"| SupabaseCloud
-    GitHub -.->|"Deploys via CI/CD"| Vercel
-
-    classDef external fill:#e1f5ff,stroke:#0288d1,stroke-width:2px
-    classDef internal fill:#fff9c4,stroke:#f57c00,stroke-width:2px
-    classDef user fill:#c8e6c9,stroke:#388e3c,stroke-width:2px
-
-    class GitHub,Vercel,SupabaseCloud external
-    class App internal
-    class Manager,Resident user
-```
-
-**Context Elements:**
-
-| Element | Type | Description |
-|---------|------|-------------|
-| **Building Manager** | Primary Actor | Administrative user who interacts with the system to manage dues, payments, and announcements |
-| **Resident** | Primary Actor | End user who views their balance, submits maintenance requests, and reads announcements |
-| **Web Browser** | Client | Chrome, Firefox, Safari, or Edge - hosts the React SPA |
-| **HomeLink Application** | System Under Design | The React frontend and Supabase backend that deliver all functionality |
-| **GitHub** | External System | Version control and source code hosting; triggers CI/CD on push |
-| **Vercel** | External System | Hosting platform that serves the static SPA via global CDN |
-| **Supabase Cloud** | External System | BaaS provider offering PostgreSQL, Auth, Realtime, and Storage |
-
-### 3.2 Overview
+### 3.1 Overview
 
 HomeLink follows a **client-server architecture** where the frontend is a React-based Single Page Application (SPA) and the backend services are provided by Supabase, a Backend-as-a-Service (BaaS) platform. This architecture enables rapid development with minimal backend code, as Supabase automatically generates REST APIs from the PostgreSQL database schema, handles user authentication, and provides real-time data synchronization through WebSocket connections.
 
@@ -326,23 +159,23 @@ The key architectural decision to use Supabase as a BaaS instead of building a c
 - **Row Level Security** - Database-level access control ensures data isolation between roles
 - **Free tier availability** - Sufficient resources for the project's scale (v1)
 
-### 3.3 The 4+1 View Model
+### 3.2 The 4+1 View Model
 
 This document organizes the HomeLink architecture using the **4+1 Architectural View Model** defined by Philippe Kruchten. Each view captures a different aspect of the system:
 
 | View | Description | Key Diagrams | Section |
 |------|-------------|-------------|---------|
-| **Logical View** | Describes the system's key abstractions as classes and entities, their attributes, methods, and relationships. Shows the object-oriented decomposition of the domain model. | Class Diagram | Section 5 |
-| **Process View** | Captures the system's dynamic behavior, including runtime interactions between components, concurrency, and synchronization. Shows how the system handles key workflows. | Sequence Diagrams, Activity Diagram | Section 6 |
-| **Development View** | Describes the static organization of the software in its development environment, including the module structure, package layout, and technology stack. | Component Diagram, Package Diagram | Section 7 |
-| **Physical View** | Maps software components to the physical infrastructure, showing deployment topology, network communication, and cloud services. | Deployment Diagram | Section 8 |
+| **Logical Architecture** | Describes the system's key abstractions as classes and entities, their attributes, methods, and relationships. Shows the object-oriented decomposition of the domain model. | Class Diagram | Section 5 |
+| **Process Architecture** | Captures the system's dynamic behavior, including runtime interactions between components, concurrency, and synchronization. Shows how the system handles key workflows. | Sequence Diagrams, Activity Diagram | Section 6 |
+| **Development Architecture** | Describes the static organization of the software in its development environment, including the module structure, package layout, and technology stack. | Component Diagram, Package Diagram | Section 7 |
+| **Physical Architecture** | Maps software components to the physical infrastructure, showing deployment topology, network communication, and cloud services. | Deployment Diagram | Section 8 |
 | **Scenarios (+1)** | Describes the most important use cases that drive and validate the architecture. Use cases connect all four views and demonstrate how they work together. | Use Case Diagram | Section 9 |
 
-### 3.4 Architectural Style
+### 3.3 Architectural Style
 
 HomeLink uses a **two-tier client-server architecture**:
 
-*Figure 3.2 - High-Level System Architecture Diagram*
+*Figure 3.1 - High-Level System Architecture Diagram*
 
 ```mermaid
 graph TB
@@ -408,99 +241,9 @@ graph TB
 | CI/CD | Vercel + GitHub Integration | Automatic deployment on `git push` to main |
 | Domain | Vercel Domains | Custom domain management and SSL certificates |
 
-### 3.5 Communication Patterns
-
-The system uses two primary communication patterns between the client and server:
-
-**1. REST API (HTTPS)**
-
-All standard CRUD operations are performed through synchronous REST API calls to the Supabase PostgREST endpoint. Examples include:
-
-| Operation | HTTP Method | Endpoint Example |
-|-----------|-----------|-----------------|
-| Fetch all units | GET | `/rest/v1/units` |
-| Create new dues | POST | `/rest/v1/dues` |
-| Update payment status | PATCH | `/rest/v1/payments?id=eq.{id}` |
-| Delete announcement | DELETE | `/rest/v1/announcements?id=eq.{id}` |
-| User login | POST | `/auth/v1/token?grant_type=password` |
-
-All REST requests include a JWT token in the `Authorization` header. Supabase validates the token and applies Row Level Security (RLS) policies before executing the query.
-
-**2. WebSocket (WSS)**
-
-Real-time updates are delivered through Supabase Realtime WebSocket subscriptions. The frontend subscribes to database table changes on component mount and automatically updates the UI when changes are detected.
-
-| Event | Table | Triggered When |
-|-------|-------|---------------|
-| INSERT | `dues` | Manager creates new monthly dues |
-| UPDATE | `payments` | Manager confirms or rejects a payment |
-| INSERT | `announcements` | Manager posts a new announcement |
-| INSERT | `maintenance_requests` | Resident submits a maintenance request |
-| UPDATE | `maintenance_requests` | Manager updates request status |
-
-When a subscribed event occurs, the React component re-fetches the relevant data and re-renders the UI without requiring a page refresh.
-
-### 3.6 Routing Structure
-
-HomeLink uses client-side routing with React Router v6. The application defines the following routes:
-
-| Route | Component | Access | Description |
-|-------|-----------|--------|-------------|
-| `/login` | LoginPage | Public | User login form |
-| `/signup` | SignupPage | Public | User registration form |
-| `/dashboard` | Dashboard | Protected | Redirects to Manager or Resident dashboard based on role |
-| `/dashboard/manager` | ManagerDashboard | Manager only | Manager overview with unit balances and pending actions |
-| `/dashboard/resident` | ResidentDashboard | Resident only | Resident overview with personal balance and dues |
-| `/dues` | DuesPage | Protected | View and manage monthly dues |
-| `/payments` | PaymentsPage | Protected | View and manage payment records |
-| `/maintenance` | MaintenancePage | Protected | Submit and track maintenance requests |
-| `/announcements` | AnnouncementsPage | Protected | View and post announcements |
-| `*` | NotFoundPage | Public | 404 error page for unmatched routes |
-
-All protected routes are wrapped in a `ProtectedRoute` component that checks for a valid JWT session and verifies the user's role before rendering the page.
-
-### 3.7 Authentication Flow
-
-The authentication system uses Supabase Auth with JWT tokens:
-
-1. **Registration:** User submits email, password, full name, and role → Supabase Auth creates account → User record inserted into `users` table with role
-2. **Login:** User submits email and password → Supabase Auth validates credentials → Returns JWT access token + refresh token → Tokens stored in browser
-3. **Session Persistence:** On page load, the app calls `supabase.auth.getSession()` to check for an existing valid session → If valid, user is auto-logged in
-4. **Token Refresh:** Supabase JS client automatically refreshes expired tokens using the refresh token
-5. **Logout:** User clicks logout → `supabase.auth.signOut()` is called → Tokens are cleared → User redirected to login page
-
-### 3.8 Architecture Decision Records (ADRs)
-
-The following table documents the key architectural decisions made during the design of HomeLink, along with their rationale and trade-offs:
-
-| ID | Decision | Alternatives Considered | Rationale | Trade-offs |
-|----|----------|------------------------|-----------|------------|
-| ADR-001 | Use **Supabase** as BaaS instead of custom Node.js backend | Node.js + Express + PostgreSQL, Firebase, AWS Amplify | Eliminates boilerplate CRUD code, provides built-in auth and realtime, free tier is sufficient for v1 | Vendor lock-in; less control over server logic |
-| ADR-002 | Use **React 18 SPA** instead of server-side rendered app | Next.js (SSR), Remix, plain HTML/JS | Simpler deployment, better interactivity, no SEO requirements for internal tool | Slower initial load vs SSR; requires JavaScript enabled |
-| ADR-003 | Use **Tailwind CSS** instead of component library (Material UI, etc.) | Material UI, Chakra UI, Bootstrap | Utility-first approach gives full design control, smaller bundle size, easy responsive design | Longer class strings in JSX; learning curve for beginners |
-| ADR-004 | Use **Row Level Security (RLS)** for authorization | Backend middleware, frontend-only checks | Security enforced at database level, cannot be bypassed by tampering with frontend, aligns with BaaS approach | Requires writing SQL policies; harder to debug than middleware |
-| ADR-005 | Use **WebSocket subscriptions** for real-time updates | Polling, Server-Sent Events (SSE) | Instant updates, lower latency, native Supabase support, better user experience | Requires persistent connection; higher resource usage than polling |
-| ADR-006 | Use **Vercel** for deployment | Netlify, AWS S3 + CloudFront, GitHub Pages | Seamless GitHub integration, automatic previews for PRs, global CDN, free tier | Vendor-specific features (e.g., edge functions) not portable |
-| ADR-007 | Use **email/password auth** only in v1 | OAuth (Google, GitHub), magic links, phone OTP | Simpler implementation, no third-party dependencies, acceptable UX for internal building app | Users must remember passwords; no social proof of identity |
-| ADR-008 | Use **client-side routing** with React Router | Server-side routing, hash-based routing | Cleaner URLs, better SEO potential, standard SPA pattern | Requires deployment configuration for route rewriting |
-
-### 3.9 Quality Attributes Overview
-
-The architecture is designed to satisfy the following quality attributes (detailed in Section 11):
-
-| Attribute | Architectural Mechanism |
-|-----------|------------------------|
-| **Security** | JWT authentication, Row Level Security, HTTPS/WSS, password hashing by Supabase Auth |
-| **Performance** | Vercel CDN for static assets, PostgreSQL indexes, React component memoization |
-| **Scalability** | Stateless frontend, Supabase auto-scaling infrastructure, horizontal scaling ready |
-| **Maintainability** | Modular React component structure, separation of concerns, custom hooks |
-| **Usability** | Responsive Tailwind design, role-specific dashboards, real-time feedback |
-| **Reliability** | Try-catch error handling, managed Supabase infrastructure, automatic retries |
-| **Portability** | Standard web technologies, no native dependencies, runs in any modern browser |
-
 ---
 
-## 4. Architectural Goals and Constraints
+## 4. Architectural Goals & Constraints
 
 ### 4.1 Architectural Goals
 
@@ -529,106 +272,9 @@ The following constraints limit the architectural choices and must be respected 
 
 ---
 
-## 6. Process Architecture
+## 5. Logical Architecture
 
-### 6.1. Key Processes
-The system focuses on several key processes to ensure secure and real-time management
-
-### 6.2. Sequence Diagram: User Login
-```mermaid
-sequenceDiagram
-actor U as User
-participant F as React Frontend
-participant A as Supabase Auth
-participant D as Supabase Database
-U->>F: Enter email and password
-F->>A: signInWithPassword(email, password)
-A-->>A: Validate credentials
-alt Valid credentials
-A-->>F: Return session token + user data
-F-->>D: Query user role
-D-->>F: Return role information
-F-->>U: Display Dashboard
-else Invalid credentials
-A-->>F: Return authentication error
-F-->>U: Display error message
-end
-```
-### 6.3. Sequence Diagram: Add Dues
-```mermaid
-sequenceDiagram
-    participant Manager
-    participant Frontend
-    participant DB as Supabase Database
-    participant Realtime as Supabase Realtime
-
-    Manager->>Frontend: Navigate to Add Dues
-    Frontend->>DB: Fetch all units
-    Manager->>Frontend: Select amount and month
-    Frontend->>DB: Save dues records
-    DB->>Realtime: Notify changes
-    Realtime-->>Frontend: Alert all residents
-```
-
-### 6.4. Sequence Diagram: Maintenance Request
-```mermaid
-sequenceDiagram
-    participant R as Resident
-    participant F as Frontend
-    participant DB as Supabase Database
-    participant M as Manager
-
-    R->>F: Fill and submit form
-    F->>DB: Save with "pending" status
-    DB-->>F: Confirm save
-    F-->>R: Request submitted successfully
-
-    Note over M, F: Review Process
-    M->>F: Open dashboard
-    F->>DB: Fetch "pending" requests
-    M->>F: Update status to "in_progress"
-    F->>DB: Update record
-    M->>F: Update status to "resolved"
-    F->>DB: Update record
-    DB-->>F: Notify Resident (via Realtime/Email)
-```
-### 6.5. Activity Diagram: Payment Flow
-```mermaid
-flowchart TD
-    Start([Start]) --> CreateDues[Manager creates monthly dues]
-    CreateDues --> Calculate[System calculates per-unit charges]
-    Calculate --> Assign[Dues assigned to all units]
-    Assign --> ViewBalance[Resident views outstanding balance]
-    
-    ViewBalance --> Decision1{Does the resident make a payment?}
-    
-    Decision1 -- No --> Unpaid[Balance remains unpaid]
-    Unpaid --> ViewBalance
-    
-    Decision1 -- Yes --> Notify[Resident notifies manager]
-    Notify --> Review[Manager reviews payment]
-    
-    Review --> Decision2{Is the payment verified?}
-    
-    Decision2 -- No --> Reject[Manager rejects, notifies resident]
-    Reject --> ViewBalance
-    
-    Decision2 -- Yes --> Settle[Mark as settled]
-    Settle --> UpdateBalance[Update balance]
-    UpdateBalance --> Record[Record in history]
-    Record --> End([End])
-```
-### 6.6. Concurrency and Real-time Behavior
-
-Supabase Realtime uses WebSocket connections for live data updates.
-When a manager updates dues or confirms a payment, all connected clients receive the update instantly.
-The frontend subscribes to relevant table changes on component mount.
-This ensures that no manual page refresh is needed, as the UI updates automatically.
-This architecture guarantees data consistency across all active sessions.
-
-## 5. Logical View
-
-The Logical View describes the system's object-oriented decomposition into classes and entities. It focuses on the key abstractions of the HomeLink domain and their structural relationships, answering the question: *"What are the key abstractions in the system?"*
+The Logical Architecture describes the system's object-oriented decomposition into classes and entities. It focuses on the key abstractions of the HomeLink domain and their structural relationships, answering the question: *"What are the key abstractions in the system?"*
 
 ### 5.1 Overview
 
@@ -769,6 +415,272 @@ The table below summarizes the 8 relationships in the HomeLink class diagram, th
 
 ---
 
+## 6. Process Architecture
+
+### 6.1. Key Processes
+The system focuses on several key processes to ensure secure and real-time management
+
+### 6.2. Sequence Diagram: User Login
+```mermaid
+sequenceDiagram
+actor U as User
+participant F as React Frontend
+participant A as Supabase Auth
+participant D as Supabase Database
+U->>F: Enter email and password
+F->>A: signInWithPassword(email, password)
+A-->>A: Validate credentials
+alt Valid credentials
+A-->>F: Return session token + user data
+F-->>D: Query user role
+D-->>F: Return role information
+F-->>U: Display Dashboard
+else Invalid credentials
+A-->>F: Return authentication error
+F-->>U: Display error message
+end
+```
+### 6.3. Sequence Diagram: Add Dues
+```mermaid
+sequenceDiagram
+    participant Manager
+    participant Frontend
+    participant DB as Supabase Database
+    participant Realtime as Supabase Realtime
+
+    Manager->>Frontend: Navigate to Add Dues
+    Frontend->>DB: Fetch all units
+    Manager->>Frontend: Select amount and month
+    Frontend->>DB: Save dues records
+    DB->>Realtime: Notify changes
+    Realtime-->>Frontend: Alert all residents
+```
+
+### 6.4. Sequence Diagram: Maintenance Request
+```mermaid
+sequenceDiagram
+    participant R as Resident
+    participant F as Frontend
+    participant DB as Supabase Database
+    participant M as Manager
+
+    R->>F: Fill and submit form
+    F->>DB: Save with "pending" status
+    DB-->>F: Confirm save
+    F-->>R: Request submitted successfully
+
+    Note over M, F: Review Process
+    M->>F: Open dashboard
+    F->>DB: Fetch "pending" requests
+    M->>F: Update status to "in_progress"
+    F->>DB: Update record
+    M->>F: Update status to "resolved"
+    F->>DB: Update record
+    DB-->>F: Notify Resident (via Realtime/Email)
+```
+### 6.5. Activity Diagram: Payment Flow
+```mermaid
+flowchart TD
+    Start([Start]) --> CreateDues[Manager creates monthly dues]
+    CreateDues --> Calculate[System calculates per-unit charges]
+    Calculate --> Assign[Dues assigned to all units]
+    Assign --> ViewBalance[Resident views outstanding balance]
+    
+    ViewBalance --> Decision1{Does the resident make a payment?}
+    
+    Decision1 -- No --> Unpaid[Balance remains unpaid]
+    Unpaid --> ViewBalance
+    
+    Decision1 -- Yes --> Notify[Resident notifies manager]
+    Notify --> Review[Manager reviews payment]
+    
+    Review --> Decision2{Is the payment verified?}
+    
+    Decision2 -- No --> Reject[Manager rejects, notifies resident]
+    Reject --> ViewBalance
+    
+    Decision2 -- Yes --> Settle[Mark as settled]
+    Settle --> UpdateBalance[Update balance]
+    UpdateBalance --> Record[Record in history]
+    Record --> End([End])
+```
+### 6.6. Concurrency and Real-time Behavior
+
+Supabase Realtime uses WebSocket connections for live data updates.
+When a manager updates dues or confirms a payment, all connected clients receive the update instantly.
+The frontend subscribes to relevant table changes on component mount.
+This ensures that no manual page refresh is needed, as the UI updates automatically.
+This architecture guarantees data consistency across all active sessions.
+
+---
+
+## 7. Development Architecture
+
+### 7.1 Technology Stack
+
+| Layer            | Technology              | Purpose                              |
+|------------------|------------------------|--------------------------------------|
+| Frontend         | React 18               | Component-based UI development       |
+| Styling          | Tailwind CSS           | Utility-first CSS framework          |
+| Backend / DB     | Supabase (PostgreSQL)  | Data storage + auto REST API         |
+| Authentication   | Supabase Auth          | User registration, login, sessions   |
+| Real-time        | Supabase Realtime      | WebSocket-based live updates         |
+| Hosting          | Vercel                 | Static site hosting with CI/CD       |
+| Version Control  | GitHub                 | Source code + Git history            |
+| Language         | JavaScript (ES6+)      | Core programming language            |
+
+
+### 7.2 Package Structure
+
+```
+src/
+ ├── components/
+ │   ├── auth/
+ │   │   ├── LoginForm.jsx
+ │   │   ├── SignUpForm.jsx
+ │   │   └── ProtectedRoute.jsx
+ │   ├── dashboard/
+ │   │   ├── ManagerDashboard.jsx
+ │   │   ├── ResidentDashboard.jsx
+ │   │   └── BalanceCard.jsx
+ │   ├── dues/
+ │   │   ├── AddDues.jsx
+ │   │   └── DuesList.jsx
+ │   ├── payments/
+ │   │   ├── PaymentHistory.jsx
+ │   │   └── PaymentConfirm.jsx
+ │   ├── maintenance/
+ │   │   ├── MaintenanceForm.jsx
+ │   │   └── MaintenanceList.jsx
+ │   └── announcements/
+ │       ├── AnnouncementForm.jsx
+ │       └── AnnouncementList.jsx
+ ├── lib/
+ │   └── supabaseClient.js
+ ├── hooks/
+ │   ├── useAuth.js
+ │   └── useRealtime.js
+ ├── pages/
+ │   ├── Login.jsx
+ │   ├── Signup.jsx
+ │   ├── Dashboard.jsx
+ │   └── NotFound.jsx
+ ├── utils/
+ │   └── calculations.js
+ ├── App.jsx
+ └── main.jsx
+```
+### 7.3 Component Diagram
+
+```mermaid
+graph TD
+
+subgraph Frontend
+    AuthModule[Auth Module]
+    ManagerDashboard[Manager Dashboard]
+    ResidentDashboard[Resident Dashboard]
+    DuesManagement[Dues Management]
+    PaymentModule[Payment Module]
+    MaintenanceModule[Maintenance Module]
+    AnnouncementsModule[Announcements Module]
+end
+
+subgraph Backend
+    SupabaseAuth[Supabase Auth]
+    PostgRESTAPI[PostgREST API]
+    PostgreSQL[PostgreSQL Database]
+    RealtimeEngine[Realtime Engine]
+end
+
+subgraph Infrastructure
+    VercelCDN[Vercel CDN]
+    GitHubRepo[GitHub Repository]
+end
+
+AuthModule --> SupabaseAuth
+ManagerDashboard --> PostgRESTAPI
+ResidentDashboard --> PostgRESTAPI
+DuesManagement --> PostgRESTAPI
+PaymentModule --> PostgRESTAPI
+MaintenanceModule --> PostgRESTAPI
+AnnouncementsModule --> PostgRESTAPI
+
+ManagerDashboard --> RealtimeEngine
+ResidentDashboard --> RealtimeEngine
+
+PostgRESTAPI --> PostgreSQL
+GitHubRepo --> VercelCDN
+```
+### 7.4 Build and Deployment Pipeline
+
+1. The developer creates a feature branch from the main branch.
+2. The developer commits changes and pushes them to GitHub.
+3. A Pull Request is opened for review.
+4. After approval, the branch is merged into the main branch.
+5. Vercel detects the update through the GitHub webhook and starts automatic deployment.
+6. The production website is updated at the public URL within seconds.
+
+---
+
+## 8. Physical Architecture
+
+### 8.1 Deployment Diagram
+
+```mermaid
+graph TD
+
+subgraph ClientDevices
+    Desktop[Desktop Browser]
+    Mobile[Mobile Browser]
+end
+
+subgraph VercelCloud
+    CDN[Vercel CDN]
+    StaticHosting[Static File Hosting]
+    ReactBundle[React SPA Bundle]
+end
+
+subgraph SupabaseCloud
+    AuthService[Auth Service]
+    Database[PostgreSQL Database]
+    Realtime[Realtime Server]
+    API[PostgREST API]
+end
+
+subgraph Development
+    GitHub[GitHub Repository]
+end
+
+Desktop --> CDN
+Mobile --> CDN
+
+CDN --> StaticHosting
+StaticHosting --> ReactBundle
+
+ReactBundle --> API
+ReactBundle --> AuthService
+ReactBundle --> Realtime
+
+API --> Database
+
+GitHub --> CDN
+```
+### 8.2 Deployment Topology
+
+The system uses a fully cloud-based and serverless deployment architecture. The client tier consists of users accessing the application through desktop and mobile browsers. The frontend is delivered using Vercel's CDN, which ensures fast and reliable distribution of static assets. The backend tier is provided by Supabase running on AWS infrastructure, offering authentication, database, API, and real-time services. CI/CD is managed through GitHub, where code updates trigger automatic deployments to Vercel.
+
+### 8.3 Network Communication
+
+| Connection                   | Protocol         | Purpose                           |
+|-----------------------------|------------------|-----------------------------------|
+| Browser <-> Vercel         | HTTPS            | Serve static frontend assets      |
+| Browser <-> Supabase API   | HTTPS (REST)     | CRUD operations on DB tables      |
+| Browser <-> Supabase Realtime | WSS (WebSocket) | Live data updates to clients      |
+| Browser <-> Supabase Auth  | HTTPS            | User registration and login       |
+| GitHub <-> Vercel          | Webhook (HTTPS)  | Trigger automated deployments     |
+
+---
+
 ## 9. Scenarios
 
 The Scenarios view (+1) describes the key use cases that drive and validate the architecture. Each use case demonstrates how the system's actors interact with HomeLink to accomplish their goals. The scenarios serve as the connecting thread between all four architectural views, showing how the logical entities, runtime processes, development components, and physical infrastructure work together to deliver user-facing functionality.
@@ -822,24 +734,7 @@ graph LR
 | UC-04 | Resident Submits Maintenance Request | Resident | MaintenanceRequest | Resident encounters a maintenance issue |
 | UC-05 | Manager Posts Announcement | Manager | Announcement | Manager needs to communicate with residents |
 
-### 9.4 Business Rules
-
-The following business rules govern the behavior of HomeLink and are enforced throughout the use cases:
-
-| ID | Rule | Enforcement Level |
-|----|------|-------------------|
-| BR-01 | A user must be authenticated before accessing any dashboard or performing any action | Frontend (ProtectedRoute) + Backend (RLS) |
-| BR-02 | Only users with the role "manager" can create dues, confirm payments, or post announcements | Backend (RLS policies) |
-| BR-03 | A resident can only view and modify their own unit's data (balance, payments, maintenance requests) | Backend (RLS policies using `auth.uid()`) |
-| BR-04 | Monthly dues can only be created once per month per unit to prevent duplicate charges | Application logic (pre-insert check) |
-| BR-05 | A payment cannot be confirmed if its amount is negative or zero | Frontend validation + Backend check constraint |
-| BR-06 | A maintenance request description must be at least 10 characters long | Frontend validation |
-| BR-07 | Announcements must have both a non-empty title and content | Frontend validation + Backend NOT NULL constraints |
-| BR-08 | When a payment is confirmed, the unit's balance must be recalculated atomically | Application logic (transaction) |
-| BR-09 | Deleted users (soft delete) cannot log in but their historical records are preserved | Backend (RLS + `deleted_at` column) |
-| BR-10 | All timestamps (`createdAt`, `resolvedAt`, `paymentDate`) are stored in UTC | Database default (`TIMESTAMPTZ`) |
-
-### 9.5 Detailed Use Cases
+### 9.4 Detailed Use Cases
 
 #### UC-01: User Registration and Login
 
@@ -978,72 +873,6 @@ The following business rules govern the behavior of HomeLink and are enforced th
 
 ---
 
-### 9.6 Extended Use Cases (Brief)
-
-The following use cases represent secondary interactions that support the primary use cases above. They are described briefly for completeness.
-
-#### UC-06: Manager Views All Units
-
-| Field | Detail |
-|-------|--------|
-| **Actor** | Manager |
-| **Precondition** | Manager is authenticated. |
-| **Flow** | Manager opens the "Units" page → System fetches all units from the `units` table → Each unit is displayed with its unit number, floor, current balance, and resident name → Manager can click a unit to see detailed payment history. |
-| **Postcondition** | Manager sees a complete overview of all building units and their financial status. |
-
----
-
-#### UC-07: Resident Views Balance and Dues
-
-| Field | Detail |
-|-------|--------|
-| **Actor** | Resident |
-| **Precondition** | Resident is authenticated and assigned to a unit. |
-| **Flow** | Resident opens the dashboard → System queries the `units` table for the resident's unit → Current balance is displayed prominently → System queries the `dues` table filtered by `unit_id` → All historical and current dues are shown in a sortable table. |
-| **Postcondition** | Resident has a clear view of their financial standing, including outstanding balance and dues history. |
-
----
-
-#### UC-08: Resident Views Announcements
-
-| Field | Detail |
-|-------|--------|
-| **Actor** | Resident |
-| **Precondition** | Resident is authenticated. |
-| **Flow** | Resident navigates to the "Announcements" tab → System fetches all announcements sorted by `createdAt` descending → Each announcement card shows title, content, and post date → Resident subscribes to the `announcements` table for real-time updates → New announcements appear automatically at the top of the list without refresh. |
-| **Postcondition** | Resident reads all current and past announcements from the building manager. |
-
----
-
-#### UC-09: Resident Views Payment History
-
-| Field | Detail |
-|-------|--------|
-| **Actor** | Resident |
-| **Precondition** | Resident is authenticated and has made at least one payment notification. |
-| **Flow** | Resident opens the "Payments" page → System fetches all payments from the `payments` table filtered by the resident's `unit_id` → Each payment is displayed with amount, date, month, and status badge (pending/confirmed/rejected) → Resident can filter by status or sort by date. |
-| **Postcondition** | Resident has full visibility of all their past payment notifications and their current statuses. |
-
----
-
-### 9.7 Use Case Traceability Matrix
-
-The following matrix shows how each use case relates to the architectural views in the other sections of this document:
-
-| Use Case | Logical View (Entities) | Process View (Workflow) | Development View (Modules) | Physical View (Infrastructure) |
-|----------|------------------------|------------------------|---------------------------|-------------------------------|
-| UC-01 | User, Manager, Resident | Login sequence | `auth/`, `lib/supabase.js` | Supabase Auth, JWT |
-| UC-02 | Manager, Unit, Dues | Create dues sequence | `dues/`, `pages/DuesPage` | PostgreSQL INSERT, Realtime broadcast |
-| UC-03 | Manager, Payment, Unit | Confirm payment sequence | `payments/`, `pages/PaymentsPage` | PostgREST PATCH, Realtime broadcast |
-| UC-04 | Resident, MaintenanceRequest | Submit maintenance sequence | `maintenance/`, `pages/MaintenancePage` | PostgreSQL INSERT |
-| UC-05 | Manager, Announcement | Post announcement sequence | `announcements/`, `pages/AnnouncementsPage` | PostgreSQL INSERT, Realtime broadcast |
-| UC-06 | Manager, Unit | View units flow | `dashboard/ManagerDashboard` | PostgREST GET |
-| UC-07 | Resident, Unit, Dues | View balance flow | `dashboard/ResidentDashboard` | PostgREST GET |
-| UC-08 | Resident, Announcement | View announcements flow | `announcements/` | PostgREST GET + Realtime SUB |
-| UC-09 | Resident, Payment | View payments flow | `payments/` | PostgREST GET (filtered) |
-
----
-
 ## 10. Size and Performance
 
 ### 10.1 System Size Estimates
@@ -1103,9 +932,9 @@ The following security measures are implemented to protect user data and ensure 
 
 ---
 
-## 12. Appendices
+## Appendices
 
-### 12.1 Acronyms and Abbreviations
+### Acronyms and Abbreviations
 
 | Acronym | Full Form |
 |---------|-----------|
@@ -1122,7 +951,7 @@ The following security measures are implemented to protect user data and ensure 
 | UI | User Interface |
 | UX | User Experience |
 
-### 12.2 Definitions
+### Definitions
 
 | Term | Definition |
 |------|-----------|
@@ -1134,7 +963,7 @@ The following security measures are implemented to protect user data and ensure 
 | PostgREST | A standalone web server that automatically generates a RESTful API from a PostgreSQL database schema, used internally by Supabase. |
 | WebSocket | A communication protocol that provides full-duplex communication channels over a single TCP connection, enabling real-time data transfer between client and server. |
 
-### 12.3 Design Principles
+### Design Principles
 
 | Principle | Explanation |
 |-----------|------------|
@@ -1143,172 +972,5 @@ The following security measures are implemented to protect user data and ensure 
 | Mobile-First Design | The UI is designed for mobile screens first using Tailwind's responsive utilities, then enhanced for larger screens using breakpoint prefixes (`md:`, `lg:`). |
 | Fail Gracefully | All API calls are wrapped in try-catch blocks with user-friendly error messages. The system degrades gracefully when real-time connections are unavailable. |
 | Least Privilege | Each user role has the minimum permissions necessary. RLS policies ensure residents can only access their own data, and managers cannot access other buildings. |
-
----
-
-## 7. Development View
-
-### 7.1 Technology Stack
-
-| Layer            | Technology              | Purpose                              |
-|------------------|------------------------|--------------------------------------|
-| Frontend         | React 18               | Component-based UI development       |
-| Styling          | Tailwind CSS           | Utility-first CSS framework          |
-| Backend / DB     | Supabase (PostgreSQL)  | Data storage + auto REST API         |
-| Authentication   | Supabase Auth          | User registration, login, sessions   |
-| Real-time        | Supabase Realtime      | WebSocket-based live updates         |
-| Hosting          | Vercel                 | Static site hosting with CI/CD       |
-| Version Control  | GitHub                 | Source code + Git history            |
-| Language         | JavaScript (ES6+)      | Core programming language            |
-
-
-### 7.2 Package Structure
-
-```
-src/
- ├── components/
- │   ├── auth/
- │   │   ├── LoginForm.jsx
- │   │   ├── SignUpForm.jsx
- │   │   └── ProtectedRoute.jsx
- │   ├── dashboard/
- │   │   ├── ManagerDashboard.jsx
- │   │   ├── ResidentDashboard.jsx
- │   │   └── BalanceCard.jsx
- │   ├── dues/
- │   │   ├── AddDues.jsx
- │   │   └── DuesList.jsx
- │   ├── payments/
- │   │   ├── PaymentHistory.jsx
- │   │   └── PaymentConfirm.jsx
- │   ├── maintenance/
- │   │   ├── MaintenanceForm.jsx
- │   │   └── MaintenanceList.jsx
- │   └── announcements/
- │       ├── AnnouncementForm.jsx
- │       └── AnnouncementList.jsx
- ├── lib/
- │   └── supabaseClient.js
- ├── hooks/
- │   ├── useAuth.js
- │   └── useRealtime.js
- ├── pages/
- │   ├── Login.jsx
- │   ├── Signup.jsx
- │   ├── Dashboard.jsx
- │   └── NotFound.jsx
- ├── utils/
- │   └── calculations.js
- ├── App.jsx
- └── main.jsx
-```
-### 7.3 Component Diagram
-
-```mermaid
-graph TD
-
-subgraph Frontend
-    AuthModule[Auth Module]
-    ManagerDashboard[Manager Dashboard]
-    ResidentDashboard[Resident Dashboard]
-    DuesManagement[Dues Management]
-    PaymentModule[Payment Module]
-    MaintenanceModule[Maintenance Module]
-    AnnouncementsModule[Announcements Module]
-end
-
-subgraph Backend
-    SupabaseAuth[Supabase Auth]
-    PostgRESTAPI[PostgREST API]
-    PostgreSQL[PostgreSQL Database]
-    RealtimeEngine[Realtime Engine]
-end
-
-subgraph Infrastructure
-    VercelCDN[Vercel CDN]
-    GitHubRepo[GitHub Repository]
-end
-
-AuthModule --> SupabaseAuth
-ManagerDashboard --> PostgRESTAPI
-ResidentDashboard --> PostgRESTAPI
-DuesManagement --> PostgRESTAPI
-PaymentModule --> PostgRESTAPI
-MaintenanceModule --> PostgRESTAPI
-AnnouncementsModule --> PostgRESTAPI
-
-ManagerDashboard --> RealtimeEngine
-ResidentDashboard --> RealtimeEngine
-
-PostgRESTAPI --> PostgreSQL
-GitHubRepo --> VercelCDN
-```
-### 7.4 Build and Deployment Pipeline
-
-1. The developer creates a feature branch from the main branch.
-2. The developer commits changes and pushes them to GitHub.
-3. A Pull Request is opened for review.
-4. After approval, the branch is merged into the main branch.
-5. Vercel detects the update through the GitHub webhook and starts automatic deployment.
-6. The production website is updated at the public URL within seconds.
-
----
-
-## 8. Physical View
-
-### 8.1 Deployment Diagram
-
-```mermaid
-graph TD
-
-subgraph ClientDevices
-    Desktop[Desktop Browser]
-    Mobile[Mobile Browser]
-end
-
-subgraph VercelCloud
-    CDN[Vercel CDN]
-    StaticHosting[Static File Hosting]
-    ReactBundle[React SPA Bundle]
-end
-
-subgraph SupabaseCloud
-    AuthService[Auth Service]
-    Database[PostgreSQL Database]
-    Realtime[Realtime Server]
-    API[PostgREST API]
-end
-
-subgraph Development
-    GitHub[GitHub Repository]
-end
-
-Desktop --> CDN
-Mobile --> CDN
-
-CDN --> StaticHosting
-StaticHosting --> ReactBundle
-
-ReactBundle --> API
-ReactBundle --> AuthService
-ReactBundle --> Realtime
-
-API --> Database
-
-GitHub --> CDN
-```
-### 8.2 Deployment Topology
-
-The system uses a fully cloud-based and serverless deployment architecture. The client tier consists of users accessing the application through desktop and mobile browsers. The frontend is delivered using Vercel’s CDN, which ensures fast and reliable distribution of static assets. The backend tier is provided by Supabase running on AWS infrastructure, offering authentication, database, API, and real-time services. CI/CD is managed through GitHub, where code updates trigger automatic deployments to Vercel.
-
-### 8.3 Network Communication
-
-| Connection                   | Protocol         | Purpose                           |
-|-----------------------------|------------------|-----------------------------------|
-| Browser <-> Vercel         | HTTPS            | Serve static frontend assets      |
-| Browser <-> Supabase API   | HTTPS (REST)     | CRUD operations on DB tables      |
-| Browser <-> Supabase Realtime | WSS (WebSocket) | Live data updates to clients      |
-| Browser <-> Supabase Auth  | HTTPS            | User registration and login       |
-| GitHub <-> Vercel          | Webhook (HTTPS)  | Trigger automated deployments     |
 
 ---
