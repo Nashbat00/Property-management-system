@@ -25,22 +25,6 @@
 
 ---
 
-## Change History
-
-| Version | Date | Author | Description |
-|---------|------|--------|-------------|
-| 0.1 | 2026-04-05 | Bager Diren Karakoyun | Initial document structure, Title Page, TOC, List of Figures |
-| 0.2 | 2026-04-05 | Bager Diren Karakoyun | Added Scope (Section 1) and References (Section 2) |
-| 0.3 | 2026-04-05 | Bager Diren Karakoyun | Added Software Architecture overview (Section 3) |
-| 0.4 | 2026-04-06 | Bager Diren Karakoyun | Added Use Case Diagram with 2 actors and 9 use cases |
-| 0.5 | 2026-04-06 | Bager Diren Karakoyun | Added 5 detailed use case descriptions (UC-01 through UC-05) |
-| 0.6 | 2026-04-06 | Bager Diren Karakoyun | Improved Section 3 with architecture diagram, technology mapping, and routing |
-| 0.7 | 2026-04-08 | Abdalrahman Mazen Ahmad Nashbat | Added Section 5.2 class diagram with 8 entities and 8 relationships |
-| 0.8 | 2026-04-08 | Abdalrahman Mazen Ahmad Nashbat | Added Section 5.1 logical architecture overview with entity descriptions |
-| 0.9 | 2026-04-08 | Abdalrahman Mazen Ahmad Nashbat | Added Section 5.3 key relationships with inheritance, association, composition semantics |
-
----
-
 ## Table of Contents
 
 1. [Scope](#1-scope)
