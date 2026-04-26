@@ -94,7 +94,21 @@ export default function CardPaymentSheet({ amount, month, onConfirm, onCancel })
 
         <form onSubmit={handleSubmit} className="px-5 py-4 space-y-3">
           <div>
-            <label className="block text-xs text-gray-500 mb-1">Card number</label>
+            <div className="flex items-center justify-between mb-1">
+              <label className="block text-xs text-gray-500">Card number</label>
+              <div className="flex items-center gap-1.5">
+                {['visa', 'mastercard', 'amex', 'discover', 'jcb'].map((b) => (
+                  <div
+                    key={b}
+                    className={`transition-all ${
+                      brand && brand !== b ? 'opacity-25 grayscale' : 'opacity-100'
+                    } ${brand === b ? 'scale-110' : ''}`}
+                  >
+                    <CardBrandLogo brand={b} className="w-8 h-5" />
+                  </div>
+                ))}
+              </div>
+            </div>
             <div className="relative">
               <input
                 type="text"
