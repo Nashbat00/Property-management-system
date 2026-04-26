@@ -127,7 +127,7 @@ export function createDues({ amount, month }) {
   return newRecords;
 }
 
-export function notifyPayment({ unitId, residentId, amount, month }) {
+export function notifyPayment({ unitId, residentId, amount, month, method = 'bank' }) {
   const newPayment = {
     id: genId('pay'),
     unitId,
@@ -136,6 +136,7 @@ export function notifyPayment({ unitId, residentId, amount, month }) {
     paymentDate: new Date().toISOString().slice(0, 10),
     month,
     status: 'pending',
+    method,
   };
   state.payments.push(newPayment);
   persist();
@@ -178,11 +179,41 @@ export function updateMaintenanceStatus(id, status) {
   const req = state.maintenance.find((m) => m.id === id);
   if (!req) throw new Error('Request not found');
   req.status = status;
-  if (status === 'resolved' && !req.resolvedAt) {
+  if (status === 'resolved') {
     req.resolvedAt = new Date().toISOString();
+  } else {
+    req.resolvedAt = null;
   }
   persist();
   return req;
+}
+
+export function deleteAnnouncement(id) {
+  const idx = state.announcements.findIndex((a) => a.id === id);
+  if (idx >= 0) {
+    state.announcements.splice(idx, 1);
+    persist();
+  }
+}
+
+export function deleteDues(id) {
+  const due = state.dues.find((d) => d.id === id);
+  if (!due) return;
+  const unit = state.units.find((u) => u.id === due.unitId);
+  if (unit) unit.currentBalance = Math.max(0, unit.currentBalance - due.amount);
+  state.dues = state.dues.filter((d) => d.id !== id);
+  persist();
+}
+
+export function deletePayment(id) {
+  const payment = state.payments.find((p) => p.id === id);
+  if (!payment) return;
+  if (payment.status === 'confirmed') {
+    const unit = state.units.find((u) => u.id === payment.unitId);
+    if (unit) unit.currentBalance += payment.amount;
+  }
+  state.payments = state.payments.filter((p) => p.id !== id);
+  persist();
 }
 
 export function postAnnouncement({ title, content, createdBy }) {

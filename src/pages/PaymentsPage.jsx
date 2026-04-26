@@ -1,7 +1,8 @@
 import { useState } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { useDemoState } from '../hooks/useDemoState';
-import { notifyPayment, updatePaymentStatus } from '../lib/demoStore';
+import { deletePayment, notifyPayment, updatePaymentStatus } from '../lib/demoStore';
+import QuickPay from '../components/payments/QuickPay';
 
 function getCurrentMonth() {
   const d = new Date();
@@ -55,8 +56,24 @@ export default function PaymentsPage() {
       <h2 className="text-2xl font-bold text-gray-900">Payments</h2>
 
       {!isManager && user?.unitId && (
+        <QuickPay
+          amount={Number(amount)}
+          month={month}
+          onPay={(method) =>
+            notifyPayment({
+              unitId: user.unitId,
+              residentId: user.id,
+              amount: Number(amount),
+              month,
+              method,
+            })
+          }
+        />
+      )}
+
+      {!isManager && user?.unitId && (
         <div className="card">
-          <h3 className="font-semibold text-gray-900 mb-3">Notify a payment</h3>
+          <h3 className="font-semibold text-gray-900 mb-3">Notify a manual / bank payment</h3>
           {success && (
             <div className="mb-3 p-2 rounded bg-green-50 text-green-700 text-sm border border-green-100">
               {success}
@@ -108,33 +125,41 @@ export default function PaymentsPage() {
                 <th className="py-2">Unit</th>
                 <th className="py-2">Month</th>
                 <th className="py-2">Amount</th>
+                <th className="py-2">Method</th>
                 <th className="py-2">Status</th>
-                {isManager && <th className="py-2">Actions</th>}
+                <th className="py-2">Actions</th>
               </tr>
             </thead>
             <tbody>
               {visiblePayments.length === 0 ? (
                 <tr>
-                  <td colSpan={isManager ? 6 : 5} className="py-3 text-gray-500 text-center">
+                  <td colSpan="7" className="py-3 text-gray-500 text-center">
                     No payments yet.
                   </td>
                 </tr>
               ) : (
                 visiblePayments.map((p) => {
                   const unit = units.find((u) => u.id === p.unitId);
+                  const methodLabel = {
+                    apple: ' Pay',
+                    google: 'G Pay',
+                    card: 'Card',
+                    bank: 'Bank',
+                  }[p.method || 'bank'];
                   return (
                     <tr key={p.id} className="border-b border-gray-100">
                       <td className="py-2">{p.paymentDate}</td>
                       <td className="py-2">{unit?.unitNumber || '-'}</td>
                       <td className="py-2">{p.month}</td>
                       <td className="py-2 font-medium">${p.amount}</td>
+                      <td className="py-2 text-gray-600">{methodLabel}</td>
                       <td className="py-2">
                         <StatusBadge status={p.status} />
                       </td>
-                      {isManager && (
-                        <td className="py-2">
-                          {p.status === 'pending' ? (
-                            <div className="flex gap-2">
+                      <td className="py-2">
+                        {isManager ? (
+                          p.status === 'pending' ? (
+                            <div className="flex gap-2 flex-wrap">
                               <button
                                 onClick={() => confirm(p.id)}
                                 className="text-xs px-2 py-1 bg-green-600 text-white rounded hover:bg-green-700"
@@ -149,10 +174,28 @@ export default function PaymentsPage() {
                               </button>
                             </div>
                           ) : (
-                            <span className="text-xs text-gray-400">-</span>
-                          )}
-                        </td>
-                      )}
+                            <button
+                              onClick={() => updatePaymentStatus(p.id, 'pending')}
+                              className="text-xs px-2 py-1 bg-gray-200 text-gray-700 rounded hover:bg-gray-300"
+                              title="Revert this decision"
+                            >
+                              ↶ Undo
+                            </button>
+                          )
+                        ) : p.status === 'pending' ? (
+                          <button
+                            onClick={() => {
+                              if (confirm('Cancel this payment notification?')) deletePayment(p.id);
+                            }}
+                            className="text-xs px-2 py-1 bg-gray-200 text-gray-700 rounded hover:bg-gray-300"
+                            title="Cancel this notification"
+                          >
+                            ↶ Undo
+                          </button>
+                        ) : (
+                          <span className="text-xs text-gray-400">-</span>
+                        )}
+                      </td>
                     </tr>
                   );
                 })

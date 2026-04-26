@@ -90,22 +90,50 @@ export default function MaintenancePage() {
                       Resolved on {new Date(m.resolvedAt).toLocaleDateString()}
                     </p>
                   )}
-                  {isManager && m.status !== 'resolved' && (
-                    <div className="flex gap-2 mt-2">
+                  {isManager && (
+                    <div className="flex gap-2 mt-2 flex-wrap">
                       {m.status === 'pending' && (
+                        <>
+                          <button
+                            onClick={() => updateMaintenanceStatus(m.id, 'in_progress')}
+                            className="text-xs px-2 py-1 bg-blue-600 text-white rounded hover:bg-blue-700"
+                          >
+                            Mark in progress
+                          </button>
+                          <button
+                            onClick={() => updateMaintenanceStatus(m.id, 'resolved')}
+                            className="text-xs px-2 py-1 bg-green-600 text-white rounded hover:bg-green-700"
+                          >
+                            Mark resolved
+                          </button>
+                        </>
+                      )}
+                      {m.status === 'in_progress' && (
+                        <>
+                          <button
+                            onClick={() => updateMaintenanceStatus(m.id, 'resolved')}
+                            className="text-xs px-2 py-1 bg-green-600 text-white rounded hover:bg-green-700"
+                          >
+                            Mark resolved
+                          </button>
+                          <button
+                            onClick={() => updateMaintenanceStatus(m.id, 'pending')}
+                            className="text-xs px-2 py-1 bg-gray-200 text-gray-700 rounded hover:bg-gray-300"
+                            title="Revert to pending"
+                          >
+                            ↶ Undo
+                          </button>
+                        </>
+                      )}
+                      {m.status === 'resolved' && (
                         <button
                           onClick={() => updateMaintenanceStatus(m.id, 'in_progress')}
-                          className="text-xs px-2 py-1 bg-blue-600 text-white rounded hover:bg-blue-700"
+                          className="text-xs px-2 py-1 bg-gray-200 text-gray-700 rounded hover:bg-gray-300"
+                          title="Reopen this request"
                         >
-                          Mark in progress
+                          ↶ Reopen
                         </button>
                       )}
-                      <button
-                        onClick={() => updateMaintenanceStatus(m.id, 'resolved')}
-                        className="text-xs px-2 py-1 bg-green-600 text-white rounded hover:bg-green-700"
-                      >
-                        Mark resolved
-                      </button>
                     </div>
                   )}
                 </div>
