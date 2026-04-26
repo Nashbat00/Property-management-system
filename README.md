@@ -1,5 +1,9 @@
 # HomeLink - Property Management System
 
+**GitHub Repository:** https://github.com/Nashbat00/Property-management-system
+
+**Live Demo:** https://homelink-nine.vercel.app
+
 ## Problem Statement
 
 Traditional building management relies on paper-based records, group chats, and informal communication channels. This leads to opaque financial records where residents cannot verify dues or payment history, scattered communication where announcements get lost, manual payment tracking prone to errors, unstructured maintenance requests that are forgotten or delayed, and no audit trail for resolving disputes.
