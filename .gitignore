@@ -29,7 +29,6 @@ dist-ssr
 *.sln
 *.sw?
 
-# Claude Code
+# Local tooling
 .claude/
-
 .vercel
