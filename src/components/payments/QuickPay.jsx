@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import ApplePaySheet from './ApplePaySheet';
 import GooglePaySheet from './GooglePaySheet';
+import CardPaymentSheet from './CardPaymentSheet';
 
 function ApplePayButton({ onClick, disabled }) {
   return (
@@ -74,11 +75,8 @@ export default function QuickPay({ amount, month, onPay }) {
     setTimeout(() => setSuccess(''), 4000);
   }
 
-  function handleCard() {
-    onPay('card');
-    setSuccess('card');
-    setTimeout(() => setSuccess(''), 4000);
-  }
+  // Card flow now opens a dedicated form with brand detection,
+  // mirroring the Apple Pay / Google Pay flow.
 
   return (
     <div className="card">
@@ -98,7 +96,7 @@ export default function QuickPay({ amount, month, onPay }) {
       <div className="flex flex-col sm:flex-row gap-2">
         <ApplePayButton onClick={() => setActiveSheet('apple')} disabled={Boolean(activeSheet)} />
         <GooglePayButton onClick={() => setActiveSheet('google')} disabled={Boolean(activeSheet)} />
-        <CardButton onClick={handleCard} disabled={Boolean(activeSheet)} />
+        <CardButton onClick={() => setActiveSheet('card')} disabled={Boolean(activeSheet)} />
       </div>
 
       <p className="text-[11px] text-gray-400 mt-2">
@@ -118,6 +116,14 @@ export default function QuickPay({ amount, month, onPay }) {
           amount={amount}
           month={month}
           onConfirm={() => complete('google')}
+          onCancel={() => setActiveSheet(null)}
+        />
+      )}
+      {activeSheet === 'card' && (
+        <CardPaymentSheet
+          amount={amount}
+          month={month}
+          onConfirm={() => complete('card')}
           onCancel={() => setActiveSheet(null)}
         />
       )}
