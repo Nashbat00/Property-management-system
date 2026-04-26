@@ -2,6 +2,8 @@
 
 **GitHub Repository:** https://github.com/Nashbat00/Property-management-system
 
+**YouTube Demo Video:** https://youtu.be/OR8KKqEzQUE
+
 **Live Demo:** https://homelink-nine.vercel.app
 
 ## Problem Statement
