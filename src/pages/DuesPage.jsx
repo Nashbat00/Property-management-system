@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { useDemoState } from '../hooks/useDemoState';
-import { createDues, deleteDues } from '../lib/demoStore';
+import { createDues, deleteDues, updateDues } from '../lib/demoStore';
 
 function getCurrentMonth() {
   const d = new Date();
@@ -15,6 +15,11 @@ export default function DuesPage() {
   const [month, setMonth] = useState(getCurrentMonth());
   const [error, setError] = useState('');
   const [success, setSuccess] = useState('');
+
+  // Editing state for a single row at a time
+  const [editingId, setEditingId] = useState(null);
+  const [editAmount, setEditAmount] = useState('');
+  const [editMonth, setEditMonth] = useState('');
 
   const isManager = user?.role === 'manager';
 
@@ -33,6 +38,25 @@ export default function DuesPage() {
     }
     const records = createDues({ amount: numericAmount, month });
     setSuccess(`Created dues for ${records.length} units (${month})`);
+  }
+
+  function startEdit(d) {
+    setEditingId(d.id);
+    setEditAmount(String(d.amount));
+    setEditMonth(d.month);
+  }
+
+  function cancelEdit() {
+    setEditingId(null);
+    setEditAmount('');
+    setEditMonth('');
+  }
+
+  function saveEdit(id) {
+    const numeric = Number(editAmount);
+    if (!numeric || numeric <= 0) return;
+    updateDues(id, { amount: numeric, month: editMonth });
+    cancelEdit();
   }
 
   return (
@@ -104,25 +128,75 @@ export default function DuesPage() {
               ) : (
                 [...dues].reverse().map((d) => {
                   const unit = units.find((u) => u.id === d.unitId);
+                  const isEditing = editingId === d.id;
                   return (
-                    <tr key={d.id} className="border-b border-gray-100">
-                      <td className="py-2 font-medium">{d.month}</td>
+                    <tr key={d.id} className="border-b border-gray-100 align-top">
+                      <td className="py-2 font-medium">
+                        {isEditing ? (
+                          <input
+                            type="month"
+                            value={editMonth}
+                            onChange={(e) => setEditMonth(e.target.value)}
+                            className="input-field py-1 text-xs"
+                          />
+                        ) : (
+                          d.month
+                        )}
+                      </td>
                       <td className="py-2">{unit?.unitNumber || '-'}</td>
-                      <td className="py-2">${d.amount}</td>
+                      <td className="py-2">
+                        {isEditing ? (
+                          <input
+                            type="number"
+                            min="1"
+                            value={editAmount}
+                            onChange={(e) => setEditAmount(e.target.value)}
+                            className="input-field py-1 text-xs w-24"
+                          />
+                        ) : (
+                          `$${d.amount}`
+                        )}
+                      </td>
                       <td className="py-2 text-gray-500">
                         {new Date(d.createdAt).toLocaleDateString()}
                       </td>
                       {isManager && (
                         <td className="py-2">
-                          <button
-                            onClick={() => {
-                              if (confirm('Remove this dues record?')) deleteDues(d.id);
-                            }}
-                            className="text-xs px-2 py-1 bg-gray-200 text-gray-700 rounded hover:bg-gray-300"
-                            title="Undo this dues record"
-                          >
-                            ↶ Undo
-                          </button>
+                          {isEditing ? (
+                            <div className="flex gap-1 flex-wrap">
+                              <button
+                                onClick={() => saveEdit(d.id)}
+                                className="text-xs px-2 py-1 bg-green-600 text-white rounded hover:bg-green-700"
+                              >
+                                Save
+                              </button>
+                              <button
+                                onClick={cancelEdit}
+                                className="text-xs px-2 py-1 bg-gray-200 text-gray-700 rounded hover:bg-gray-300"
+                              >
+                                Cancel
+                              </button>
+                            </div>
+                          ) : (
+                            <div className="flex gap-1 flex-wrap">
+                              <button
+                                onClick={() => startEdit(d)}
+                                className="text-xs px-2 py-1 bg-blue-600 text-white rounded hover:bg-blue-700"
+                                title="Edit amount or month"
+                              >
+                                ✎ Edit
+                              </button>
+                              <button
+                                onClick={() => {
+                                  if (confirm('Remove this dues record?')) deleteDues(d.id);
+                                }}
+                                className="text-xs px-2 py-1 bg-gray-200 text-gray-700 rounded hover:bg-gray-300"
+                                title="Undo this dues record"
+                              >
+                                ↶ Undo
+                              </button>
+                            </div>
+                          )}
                         </td>
                       )}
                     </tr>

@@ -205,6 +205,22 @@ export function deleteDues(id) {
   persist();
 }
 
+export function updateDues(id, { amount, month }) {
+  const due = state.dues.find((d) => d.id === id);
+  if (!due) return;
+  const unit = state.units.find((u) => u.id === due.unitId);
+  if (typeof amount === 'number' && amount !== due.amount) {
+    const diff = amount - due.amount;
+    if (unit) unit.currentBalance = Math.max(0, unit.currentBalance + diff);
+    due.amount = amount;
+  }
+  if (typeof month === 'string' && month !== due.month) {
+    due.month = month;
+  }
+  persist();
+  return due;
+}
+
 export function deletePayment(id) {
   const payment = state.payments.find((p) => p.id === id);
   if (!payment) return;
