@@ -22,14 +22,14 @@ export default function ResidentDashboard() {
 
       <div className="grid md:grid-cols-3 gap-4">
         <div className="card">
-          <p className="text-sm text-gray-500">Current Balance</p>
+          <p className="text-sm text-gray-500">Amount Due</p>
           <p className={`text-3xl font-bold mt-1 ${
             (myUnit?.currentBalance || 0) > 0 ? 'text-orange-600' : 'text-green-600'
           }`}>
             ${myUnit?.currentBalance || 0}
           </p>
           <p className="text-xs text-gray-400 mt-1">
-            {(myUnit?.currentBalance || 0) > 0 ? 'Payment required' : 'All paid'}
+            {(myUnit?.currentBalance || 0) > 0 ? 'You owe this to the manager' : 'All paid'}
           </p>
         </div>
         <div className="card">
