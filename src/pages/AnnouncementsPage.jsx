@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { useDemoState } from '../hooks/useDemoState';
-import { postAnnouncement } from '../lib/demoStore';
+import { deleteAnnouncement, postAnnouncement } from '../lib/demoStore';
 
 export default function AnnouncementsPage() {
   const { user } = useAuth();
@@ -71,6 +71,19 @@ export default function AnnouncementsPage() {
                 </span>
               </div>
               <p className="text-sm text-gray-700 whitespace-pre-wrap">{ann.content}</p>
+              {isManager && (
+                <div className="mt-3 flex justify-end">
+                  <button
+                    onClick={() => {
+                      if (confirm('Delete this announcement?')) deleteAnnouncement(ann.id);
+                    }}
+                    className="text-xs px-2 py-1 bg-gray-200 text-gray-700 rounded hover:bg-gray-300"
+                    title="Undo / remove this announcement"
+                  >
+                    ↶ Undo
+                  </button>
+                </div>
+              )}
             </div>
           ))
         )}

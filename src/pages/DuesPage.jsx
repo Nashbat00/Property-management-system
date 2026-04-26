@@ -1,7 +1,7 @@
 import { useState } from 'react';
 import { useAuth } from '../hooks/useAuth';
 import { useDemoState } from '../hooks/useDemoState';
-import { createDues } from '../lib/demoStore';
+import { createDues, deleteDues } from '../lib/demoStore';
 
 function getCurrentMonth() {
   const d = new Date();
@@ -91,12 +91,13 @@ export default function DuesPage() {
                 <th className="py-2">Unit</th>
                 <th className="py-2">Amount</th>
                 <th className="py-2">Created</th>
+                {isManager && <th className="py-2">Actions</th>}
               </tr>
             </thead>
             <tbody>
               {dues.length === 0 ? (
                 <tr>
-                  <td colSpan="4" className="py-3 text-gray-500 text-center">
+                  <td colSpan={isManager ? 5 : 4} className="py-3 text-gray-500 text-center">
                     No dues yet.
                   </td>
                 </tr>
@@ -111,6 +112,19 @@ export default function DuesPage() {
                       <td className="py-2 text-gray-500">
                         {new Date(d.createdAt).toLocaleDateString()}
                       </td>
+                      {isManager && (
+                        <td className="py-2">
+                          <button
+                            onClick={() => {
+                              if (confirm('Remove this dues record?')) deleteDues(d.id);
+                            }}
+                            className="text-xs px-2 py-1 bg-gray-200 text-gray-700 rounded hover:bg-gray-300"
+                            title="Undo this dues record"
+                          >
+                            ↶ Undo
+                          </button>
+                        </td>
+                      )}
                     </tr>
                   );
                 })
